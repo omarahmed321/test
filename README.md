@@ -8,14 +8,28 @@ It was created and verified to run flawlessly on Arch Linux / CachyOS bases.
 
 ## 🚀 Quick Start (Replicate on Any Device)
 
-To deploy your complete setup onto a fresh installation, open your terminal and run the following command sequence:
+To deploy your complete setup onto a fresh installation, you can run it either as a combined **one-liner command** or by executing the steps individually.
 
+### Option 1: The Automated One-Liner (Recommended)
+Copy and paste this single command into your terminal to clone, enter, and execute the restorer automatically:
+```bash
+git clone https://github.com/omarahmed321/cachyos-restore.git && cd cachyos-restore && chmod +x restore_my_setup.sh && ./restore_my_setup.sh
+```
+
+### Option 2: Run directly via `curl` (No manual cloning required)
+Since the restoration script is fully self-contained, you can execute it directly from the cloud without even cloning the repository manually:
+```bash
+curl -sSL https://raw.githubusercontent.com/omarahmed321/cachyos-restore/main/restore_my_setup.sh | bash
+```
+
+### Option 3: Step-by-Step Execution
+If you prefer running each step individually:
 ```bash
 # 1. Clone the repository
-git clone https://github.com/<your-username>/cachyos-hyprland-restore.git
+git clone https://github.com/omarahmed321/cachyos-restore.git
 
 # 2. Enter the repository directory
-cd cachyos-hyprland-restore
+cd cachyos-restore
 
 # 3. Make the script executable
 chmod +x restore_my_setup.sh
