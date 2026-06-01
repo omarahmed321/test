@@ -1655,23 +1655,36 @@ EOF
 # --- SDDM Theme Configuration ---
 echo -e "\n${BLUE}${BOLD}Configuring SDDM Candy theme...${NC}"
 if [ -f "$HOME/hyde/Source/arcs/Sddm_Candy.tar.gz" ]; then
-    if sudo -n true &>/dev/null; then
-        sudo mkdir -p /usr/share/sddm/themes
-        sudo tar -xzf "$HOME/hyde/Source/arcs/Sddm_Candy.tar.gz" -C /usr/share/sddm/themes/
-        if [ -f /etc/sddm.conf ]; then
-            if ! grep -q "^Current=" /etc/sddm.conf; then
-                echo -e "\n[Theme]\nCurrent=Candy" | sudo tee -a /etc/sddm.conf >/dev/null
-            else
-                sudo sed -i 's/^Current=.*/Current=Candy/' /etc/sddm.conf
-            fi
+    echo -e "${CYAN}Installing SDDM theme Candy...${NC}"
+    sudo mkdir -p /usr/share/sddm/themes
+    sudo tar -xzf "$HOME/hyde/Source/arcs/Sddm_Candy.tar.gz" -C /usr/share/sddm/themes/
+    
+    if [ -f /etc/sddm.conf ]; then
+        if ! grep -q "^Current=" /etc/sddm.conf; then
+            echo -e "\n[Theme]\nCurrent=Candy" | sudo tee -a /etc/sddm.conf >/dev/null
         else
-            echo -e "[Theme]\nCurrent=Candy" | sudo tee /etc/sddm.conf >/dev/null
+            sudo sed -i 's/^Current=.*/Current=Candy/' /etc/sddm.conf
         fi
-        echo -e "${GREEN}[OK] SDDM Candy theme configured successfully!${NC}"
     else
-        echo -e "    ${YELLOW}[WARNING] Sudo requires a password. Skipping automatic SDDM Candy theme installation.${NC}"
-        echo -e "    To manually set the login theme, extract Sddm_Candy.tar.gz to /usr/share/sddm/themes/ and set Current=Candy under [Theme] in /etc/sddm.conf.${NC}"
+        echo -e "[Theme]\nCurrent=Candy" | sudo tee /etc/sddm.conf >/dev/null
     fi
+
+    # Set SDDM Candy background to match the active theme wallpaper dynamically
+    if [ -L "$HOME/.cache/hyde/wall.set" ]; then
+        echo -e "${CYAN}Linking SDDM background to current desktop wallpaper...${NC}"
+        sudo cp -L "$HOME/.cache/hyde/wall.set" /usr/share/sddm/themes/Candy/backgrounds/bg.png
+    elif [ -f "$HOME/.cache/hyde/wall.set" ]; then
+        echo -e "${CYAN}Copying SDDM background to current desktop wallpaper...${NC}"
+        sudo cp "$HOME/.cache/hyde/wall.set" /usr/share/sddm/themes/Candy/backgrounds/bg.png
+    fi
+
+    # Customize SDDM Candy AccentColor to match GruvboxRetro orange theme
+    if [ -f "/usr/share/sddm/themes/Candy/theme.conf" ]; then
+        echo -e "${CYAN}Setting SDDM Candy accent color to theme-compatible orange...${NC}"
+        sudo sed -i 's/^AccentColor=.*/AccentColor="#fe8019"/' /usr/share/sddm/themes/Candy/theme.conf
+    fi
+
+    echo -e "${GREEN}[OK] SDDM Candy theme configured successfully!${NC}"
 fi
 
 # 5. Apply Settings and Refresh
