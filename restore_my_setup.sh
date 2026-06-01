@@ -74,6 +74,7 @@ REQUIRED_PACKAGES=(
     network-manager-applet brightnessctl pamixer playerctl udiskie
     nwg-look kvantum kvantum-qt5 qt5ct qt6ct qt5-wayland qt6-wayland
     awww parallel pacman-contrib imagemagick ffmpegthumbs kde-cli-tools
+    bc 8188eu-dkms-git
 )
 
 # Install packages
@@ -1719,6 +1720,17 @@ if [ -f "$HOME/hyde/Source/arcs/Sddm_Candy.tar.gz" ]; then
     fi
 
     echo -e "${GREEN}[OK] SDDM Candy theme configured successfully!${NC}"
+fi
+
+# --- RTL8188EUS USB Wi-Fi Hotspot driver configuration ---
+echo -e "\n${BLUE}${BOLD}Configuring RTL8188EUS USB Wi-Fi driver and blacklisting rtl8xxxu...${NC}"
+# Blacklist default rtl8xxxu driver to ensure 8188eu takes over
+if [ ! -f /etc/modprobe.d/rtl8xxxu.conf ] || ! grep -q "blacklist rtl8xxxu" /etc/modprobe.d/rtl8xxxu.conf; then
+    echo -e "${CYAN}Creating blacklisting rule for default rtl8xxxu driver...${NC}"
+    echo "blacklist rtl8xxxu" | sudo tee /etc/modprobe.d/rtl8xxxu.conf >/dev/null
+    echo -e "${GREEN}[OK] Blacklisted rtl8xxxu driver successfully!${NC}"
+else
+    echo -e "${GREEN}[OK] rtl8xxxu driver is already blacklisted.${NC}"
 fi
 
 # Robustly clone and patch preset HyDE themes to ensure Waybar theme switches work perfectly out-of-the-box
