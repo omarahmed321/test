@@ -1707,10 +1707,12 @@ if [ -f "$HOME/hyde/Source/arcs/Sddm_Candy.tar.gz" ]; then
         sudo cp "$HOME/.cache/hyde/wall.set" /usr/share/sddm/themes/Candy/backgrounds/bg.png
     fi
 
-    # Customize SDDM Candy AccentColor to match GruvboxRetro orange theme
+    # Customize SDDM Candy layout and accent color
     if [ -f "/usr/share/sddm/themes/Candy/theme.conf" ]; then
-        echo -e "${CYAN}Setting SDDM Candy accent color to theme-compatible orange...${NC}"
+        echo -e "${CYAN}Customizing SDDM Candy layout (center, no header, theme orange)...${NC}"
         sudo sed -i 's/^AccentColor=.*/AccentColor="#fe8019"/' /usr/share/sddm/themes/Candy/theme.conf
+        sudo sed -i 's/^FormPosition=.*/FormPosition="center"/' /usr/share/sddm/themes/Candy/theme.conf
+        sudo sed -i 's/^HeaderText=.*/HeaderText=""/' /usr/share/sddm/themes/Candy/theme.conf
     fi
 
     echo -e "${GREEN}[OK] SDDM Candy theme configured successfully!${NC}"
