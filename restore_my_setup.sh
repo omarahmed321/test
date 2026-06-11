@@ -841,34 +841,130 @@ layerrule = no_anim on, match:namespace selection
 source = ~/.config/hypr/animations/animations-default.conf
 EOF
 
-# --- WRITE ~/.config/hypr/monitors.conf ---
-echo -e "${CYAN}Writing ~/.config/hypr/monitors.conf...${NC}"
-cat << 'EOF' > "$HOME/.config/hypr/monitors.conf"
+# --- WRITE ~/.config/hypr/monitors.conf (DYNAMIC DETECTION) ---
+echo -e "${CYAN}Dynamically detecting connected monitors...${NC}"
 
+# Initialize arrays/variables
+MONITOR_CONFIGS=""
+WORKSPACE_RULES=""
+
+# Check if hyprctl is available and running
+if command -v hyprctl &>/dev/null && hyprctl monitors &>/dev/null; then
+    echo -e "${GREEN}Hyprland is running. Using hyprctl for detection...${NC}"
+    MONITORS_JSON=$(hyprctl monitors -j)
+    
+    # Sort monitors by refreshRate so the main high-refresh one is last
+    NUM_MONITORS=$(echo "$MONITORS_JSON" | jq '. | length')
+    
+    if [ "$NUM_MONITORS" -gt 0 ]; then
+        MAIN_NAME=$(echo "$MONITORS_JSON" | jq -r 'sort_by(.refreshRate) | last | .name')
+        MAIN_HZ=$(echo "$MONITORS_JSON" | jq -r 'sort_by(.refreshRate) | last | .refreshRate | round')
+        MAIN_WIDTH=$(echo "$MONITORS_JSON" | jq -r 'sort_by(.refreshRate) | last | .width')
+        MAIN_HEIGHT=$(echo "$MONITORS_JSON" | jq -r 'sort_by(.refreshRate) | last | .height')
+        
+        if [ "$NUM_MONITORS" -gt 1 ]; then
+            # We have a secondary monitor
+            SIDE_NAME=$(echo "$MONITORS_JSON" | jq -r 'sort_by(.refreshRate) | .[0] | .name')
+            SIDE_HZ=$(echo "$MONITORS_JSON" | jq -r 'sort_by(.refreshRate) | .[0] | .refreshRate | round')
+            SIDE_WIDTH=$(echo "$MONITORS_JSON" | jq -r 'sort_by(.refreshRate) | .[0] | .width')
+            SIDE_HEIGHT=$(echo "$MONITORS_JSON" | jq -r 'sort_by(.refreshRate) | .[0] | .height')
+            
+            # Write configurations for dual-monitor setup
+            # Side monitor (rotated portrait on the left)
+            MONITOR_CONFIGS="monitor = ${SIDE_NAME},${SIDE_WIDTH}x${SIDE_HEIGHT}@${SIDE_HZ},0x0,1,transform,1\n"
+            # Main monitor (aligned to the right of the rotated side monitor)
+            # Offset X is the height of the side monitor (which becomes its width when rotated)
+            OFFSET_X=${SIDE_HEIGHT}
+            # Centered Y offset: (rotated_height - main_height) / 2 -> (SIDE_WIDTH - MAIN_HEIGHT) / 2
+            OFFSET_Y=$(( (SIDE_WIDTH - MAIN_HEIGHT) / 2 ))
+            [ $OFFSET_Y -lt 0 ] && OFFSET_Y=0
+            MONITOR_CONFIGS="${MONITOR_CONFIGS}monitor = ${MAIN_NAME},${MAIN_WIDTH}x${MAIN_HEIGHT}@${MAIN_HZ},${OFFSET_X}x${OFFSET_Y},1"
+            
+            # Workspace rules for dual-monitor
+            WORKSPACE_RULES="# Workspace Rules\n"
+            for w in {1..8}; do
+                WORKSPACE_RULES="${WORKSPACE_RULES}workspace = ${w}, monitor:${MAIN_NAME}"
+                [ $w -eq 1 ] && WORKSPACE_RULES="${WORKSPACE_RULES}, default:true"
+                WORKSPACE_RULES="${WORKSPACE_RULES}\n"
+            done
+            for w in {9..10}; do
+                WORKSPACE_RULES="${WORKSPACE_RULES}workspace = ${w}, monitor:${SIDE_NAME}"
+                [ $w -eq 9 ] && WORKSPACE_RULES="${WORKSPACE_RULES}, default:true"
+                WORKSPACE_RULES="${WORKSPACE_RULES}\n"
+            done
+        else
+            # Single monitor setup
+            MONITOR_CONFIGS="monitor = ${MAIN_NAME},${MAIN_WIDTH}x${MAIN_HEIGHT}@${MAIN_HZ},0x0,1"
+            WORKSPACE_RULES="# Workspace Rules\n"
+            for w in {1..10}; do
+                WORKSPACE_RULES="${WORKSPACE_RULES}workspace = ${w}, monitor:${MAIN_NAME}"
+                [ $w -eq 1 ] && WORKSPACE_RULES="${WORKSPACE_RULES}, default:true"
+                WORKSPACE_RULES="${WORKSPACE_RULES}\n"
+            done
+        fi
+    fi
+fi
+
+# Fallback: If no monitor configs were generated (e.g. hyprctl not running), use DRM sysfs
+if [ -z "$MONITOR_CONFIGS" ]; then
+    echo -e "${YELLOW}Hyprland is not running or no monitors detected via hyprctl. Scanning /sys/class/drm/...${NC}"
+    CONNECTED_DEVS=()
+    for card in /sys/class/drm/card*-*; do
+        if [ -f "$card/status" ] && [ "$(cat "$card/status")" = "connected" ]; then
+            dev_name=$(basename "$card" | cut -d'-' -f2-)
+            CONNECTED_DEVS+=("$dev_name")
+        fi
+    done
+    
+    NUM_DEVS=${#CONNECTED_DEVS[@]}
+    if [ "$NUM_DEVS" -gt 0 ]; then
+        # Take the first one as main
+        MAIN_NAME="${CONNECTED_DEVS[0]}"
+        if [ "$NUM_DEVS" -gt 1 ]; then
+            SIDE_NAME="${CONNECTED_DEVS[1]}"
+            # Default fallback for dual monitor
+            MONITOR_CONFIGS="monitor = ${SIDE_NAME},preferred,0x0,1,transform,1\nmonitor = ${MAIN_NAME},preferred,1080x700,1"
+            
+            WORKSPACE_RULES="# Workspace Rules\n"
+            for w in {1..8}; do
+                WORKSPACE_RULES="${WORKSPACE_RULES}workspace = ${w}, monitor:${MAIN_NAME}"
+                [ $w -eq 1 ] && WORKSPACE_RULES="${WORKSPACE_RULES}, default:true"
+                WORKSPACE_RULES="${WORKSPACE_RULES}\n"
+            done
+            for w in {9..10}; do
+                WORKSPACE_RULES="${WORKSPACE_RULES}workspace = ${w}, monitor:${SIDE_NAME}"
+                [ $w -eq 9 ] && WORKSPACE_RULES="${WORKSPACE_RULES}, default:true"
+                WORKSPACE_RULES="${WORKSPACE_RULES}\n"
+            done
+        else
+            # Single monitor fallback
+            MONITOR_CONFIGS="monitor = ${MAIN_NAME},preferred,auto,1"
+            WORKSPACE_RULES="# Workspace Rules\n"
+            for w in {1..10}; do
+                WORKSPACE_RULES="${WORKSPACE_RULES}workspace = ${w}, monitor:${MAIN_NAME}"
+                [ $w -eq 1 ] && WORKSPACE_RULES="${WORKSPACE_RULES}, default:true"
+                WORKSPACE_RULES="${WORKSPACE_RULES}\n"
+            done
+        fi
+    else
+        # Extreme fallback
+        MONITOR_CONFIGS="monitor = ,preferred,auto,1"
+        WORKSPACE_RULES="# Workspace Rules\nworkspace = 1, monitor:, default:true"
+    fi
+fi
+
+# Write to file
+mkdir -p "$HOME/.config/hypr"
+cat << MONEOF > "$HOME/.config/hypr/monitors.conf"
 # █▀▄▀█ █▀█ █▄░█ █ ▀█▀ █▀█ █▀█ █▀
 # █░▀░█ █▄█ █░▀█ █ ░█░ █▄█ █▀▄ ▄█
+# Dynamically generated by restore_my_setup.sh
 
-# DP-2 (CMT GM238-FFS) - 144Hz main display
-monitor = DP-2,1920x1080@144,1080x700,1
+$(echo -e "$MONITOR_CONFIGS")
 
-# DP-1 (HP Z23n) - Portrait mode, left of DP-2, fine-tuned alignment
-monitor = DP-1,1920x1080@60,0x0,1,transform,1
-
-# Workspace Rules
-# Assign workspaces 1 to 8 to DP-2 (144Hz main display)
-workspace = 1, monitor:DP-2, default:true
-workspace = 2, monitor:DP-2
-workspace = 3, monitor:DP-2
-workspace = 4, monitor:DP-2
-workspace = 5, monitor:DP-2
-workspace = 6, monitor:DP-2
-workspace = 7, monitor:DP-2
-workspace = 8, monitor:DP-2
-
-# Assign workspaces 9 and 10 to DP-1 (60Hz portrait side screen)
-workspace = 9, monitor:DP-1, default:true
-workspace = 10, monitor:DP-1
-EOF
+$(echo -e "$WORKSPACE_RULES")
+MONEOF
+echo -e "${GREEN}[OK] Dynamic monitors.conf generated successfully!${NC}"
 
 # --- WRITE ~/.config/hypr/nvidia.conf ---
 echo -e "${CYAN}Writing ~/.config/hypr/nvidia.conf...${NC}"
