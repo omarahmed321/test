@@ -76,6 +76,8 @@ REQUIRED_PACKAGES=(
     awww parallel pacman-contrib imagemagick ffmpegthumbs kde-cli-tools
     bc 8188eu-dkms-git antigravity antigravity-ide prismlauncher
     create_ap wtype gnome-keyring ttf-cascadia-code-nerd
+    oh-my-zsh-git zsh-theme-powerlevel10k zsh-autosuggestions
+    zsh-syntax-highlighting zsh-completions
 )
 
 # Install packages
