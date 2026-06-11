@@ -156,6 +156,24 @@ def patch_makefile(makefile_path):
         f.write(content)
     print("Makefile patching completed.")
 
+def patch_version_h(target_dir):
+    print("Patching version.h includes...")
+    files_to_patch = [
+        os.path.join(target_dir, "include", "osdep_service_linux.h"),
+        os.path.join(target_dir, "platform", "platform_aml_s905_sdio.h")
+    ]
+    for filepath in files_to_patch:
+        if os.path.exists(filepath):
+            print(f"  - Patching {filepath}...")
+            with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
+            if '#include "version.h"' in content:
+                content = content.replace('#include "version.h"', '#include <linux/version.h>')
+                print("    - Replaced #include \"version.h\" with <linux/version.h>")
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write(content)
+    print("version.h patching completed.")
+
 def main():
     if len(sys.argv) > 1:
         target_dir = sys.argv[1]
@@ -177,6 +195,8 @@ def main():
     makefile_to_patch = os.path.join(target_dir, "Makefile")
     if os.path.exists(makefile_to_patch):
         patch_makefile(makefile_to_patch)
+
+    patch_version_h(target_dir)
 
 if __name__ == "__main__":
     main()
