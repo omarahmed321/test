@@ -112,7 +112,7 @@ REQUIRED_PACKAGES=(
     network-manager-applet brightnessctl pamixer playerctl udiskie
     nwg-look kvantum kvantum-qt5 qt5ct qt6ct qt5-wayland qt6-wayland
     awww parallel pacman-contrib imagemagick ffmpegthumbs kde-cli-tools
-    bc 8188eu-dkms-git antigravity antigravity-ide prismlauncher
+    bc 8188eu-dkms-git antigravity prismlauncher
     create_ap wtype gnome-keyring ttf-cascadia-code-nerd
     oh-my-zsh-git zsh-theme-powerlevel10k zsh-autosuggestions
     zsh-syntax-highlighting zsh-completions
@@ -373,6 +373,84 @@ echo "--password-store=gnome-libsecret" > "$HOME/.config/antigravity-ide-flags.c
 echo -e "${CYAN}Ensuring gnome-keyring-daemon systemd services are unmasked...${NC}"
 systemctl --user unmask gnome-keyring-daemon.service gnome-keyring-daemon.socket 2>/dev/null || true
 systemctl --user enable gnome-keyring-daemon.service gnome-keyring-daemon.socket 2>/dev/null || true
+
+# --- VS Code Configurations & Extensions ---
+echo -e "\n${BLUE}${BOLD}Configuring Visual Studio Code...${NC}"
+mkdir -p "$HOME/.config/Code/User"
+
+echo -e "${CYAN}Writing VS Code settings.json...${NC}"
+cat << 'EOF' > "$HOME/.config/Code/User/settings.json"
+{
+  "workbench.colorTheme": "wallbash",
+  "terminal.integrated.foreground": "#ebdbb2",
+  "terminal.integrated.background": "#272727",
+  "terminal.integrated.selectionBackground": "#655b53",
+  "terminal.integrated.cursorStyle": "block",
+  "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font', 'monospace'",
+  "terminal.integrated.ansiBlack": "#272727",
+  "terminal.integrated.ansiRed": "#cc231c",
+  "terminal.integrated.ansiGreen": "#989719",
+  "terminal.integrated.ansiYellow": "#d79920",
+  "terminal.integrated.ansiBlue": "#448488",
+  "terminal.integrated.ansiMagenta": "#b16185",
+  "terminal.integrated.ansiCyan": "#689d69",
+  "terminal.integrated.ansiWhite": "#a89983",
+  "terminal.integrated.ansiBrightBlack": "#928373",
+  "terminal.integrated.ansiBrightRed": "#fb4833",
+  "terminal.integrated.ansiBrightGreen": "#b8ba25",
+  "terminal.integrated.ansiBrightYellow": "#fabc2e",
+  "terminal.integrated.ansiBrightBlue": "#83a597",
+  "terminal.integrated.ansiBrightMagenta": "#d3859a",
+  "terminal.integrated.ansiBrightCyan": "#8ec07b",
+  "terminal.integrated.ansiBrightWhite": "#ebdbb2",
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact",
+    "typescript": "typescriptreact"
+  },
+  "emmet.triggerExpansionOnTab": true,
+  "emmet.showExpandedAbbreviation": "always",
+  "emmet.showSuggestionsAsSnippets": true,
+  "editor.snippetSuggestions": "top",
+  "editor.quickSuggestionsDelay": 0,
+  "editor.wordBasedSuggestions": "off",
+  "editor.inlineSuggest.enabled": false,
+  "github.copilot.editor.enableAutoCompletions": false,
+  "editor.quickSuggestions": {
+    "other": "on",
+    "comments": "off",
+    "strings": "off"
+  },
+  "editor.suggestOnTriggerCharacters": true,
+  "tailwindCSS.includeLanguages": {
+    "javascript": "javascriptreact",
+    "typescript": "typescriptreact"
+  }
+}
+EOF
+
+# Install extensions if code CLI is available
+if command -v code &>/dev/null; then
+    echo -e "${CYAN}Installing VS Code extensions...${NC}"
+    VSCODE_EXTS=(
+        bradlc.vscode-tailwindcss
+        brandonkirbyson.vscode-animations
+        drcika.apc-extension
+        dsznajder.es7-react-js-snippets
+        esbenp.prettier-vscode
+        formulahendry.auto-close-tag
+        jdinhlife.gruvbox
+        pkief.material-icon-theme
+        prettier.prettier-vscode
+        undefined_publisher.wallbash
+    )
+    for ext in "${VSCODE_EXTS[@]}"; do
+        echo -e "  - Installing extension: ${CYAN}$ext${NC}..."
+        code --install-extension "$ext" --force &>/dev/null || true
+    done
+    echo -e "${GREEN}[OK] VS Code extensions installed successfully!${NC}"
+else
+    echo -e "${YELLOW}[WARNING] VS Code command line 'code' not found. Skipping extension installation.${NC}"
+fi
 
 # Robustly copy default themes and animations from the cloned HyDE repo if they exist
 if [ -d "$HOME/hyde/Configs/.config/hypr" ]; then
