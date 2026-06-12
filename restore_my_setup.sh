@@ -2034,10 +2034,38 @@ orig=$(hyprctl cursorpos | tr -d ' ')
 orig_x=$(echo "$orig" | cut -d',' -f1)
 orig_y=$(echo "$orig" | cut -d',' -f2)
 
-# Touch each monitor to force cursor plane redraw and clear display manager ghost cursors
-hyprctl monitors -j | jq -r '.[] | "\(.x + 100) \(.y + 100)"' | while read -r x y; do
-    hyprctl dispatch movecursor "$x" "$y"
-    sleep 0.05
+# Touch the four corners of each monitor to force cursor plane redraw
+hyprctl monitors -j | jq -r '.[] | "\(.x) \(.y) \(.width) \(.height) \(.transform)"' | while read -r mx my mw mh mt; do
+    if [ "$mt" -eq 1 ] || [ "$mt" -eq 3 ]; then
+        w=$mh
+        h=$mw
+    else
+        w=$mw
+        h=$mh
+    fi
+    
+    # Calculate corners
+    c1_x=$((mx + 10))
+    c1_y=$((my + 10))
+    
+    c2_x=$((mx + w - 10))
+    c2_y=$((my + 10))
+    
+    c3_x=$((mx + 10))
+    c3_y=$((my + h - 10))
+    
+    c4_x=$((mx + w - 10))
+    c4_y=$((my + h - 10))
+    
+    # Move cursor to all 4 corners
+    hyprctl dispatch movecursor "$c1_x" "$c1_y"
+    sleep 0.02
+    hyprctl dispatch movecursor "$c2_x" "$c2_y"
+    sleep 0.02
+    hyprctl dispatch movecursor "$c3_x" "$c3_y"
+    sleep 0.02
+    hyprctl dispatch movecursor "$c4_x" "$c4_y"
+    sleep 0.02
 done
 
 # Restore original cursor position
