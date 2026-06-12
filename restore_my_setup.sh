@@ -3079,6 +3079,12 @@ if [ -f "$HOME/hyde/Scripts/themepatcher.lst" ] && [ -f "$HOME/hyde/Scripts/them
     echo -e "${GREEN}[OK] All preset HyDE themes installed and patched successfully!${NC}"
 fi
 
+# Force the 'Gruvbox Retro' theme to use 'Bibata-Modern-Ice' (white cursor) instead of 'Gruvbox-Retro' (black cursor)
+if [ -f "$HOME/.config/hyde/themes/Gruvbox Retro/hypr.theme" ]; then
+    echo -e "${CYAN}Configuring 'Gruvbox Retro' theme to use 'Bibata-Modern-Ice' (white cursor)...${NC}"
+    sed -i 's/\$CURSOR_THEME = .*/\$CURSOR_THEME = Bibata-Modern-Ice/g' "$HOME/.config/hyde/themes/Gruvbox Retro/hypr.theme"
+fi
+
 # 5. Apply Settings and Refresh
 echo -e "\n${BLUE}${BOLD}Refreshing themes, icon caches, and font caches...${NC}"
 fc-cache -f
