@@ -36,6 +36,16 @@ if [ ! -f /etc/arch-release ]; then
     read -p " :: Press Enter to continue anyway, or Ctrl+C to abort..."
 fi
 
+# Detect other Desktop Environments
+if [ -n "$XDG_CURRENT_DESKTOP" ] && [ "$XDG_CURRENT_DESKTOP" != "Hyprland" ]; then
+    echo -e "${YELLOW}[WARNING] You are currently running the '$XDG_CURRENT_DESKTOP' desktop environment.${NC}"
+    read -p "Wanna start the setup? (This setup will change your desktop environment to Hyprland + HyDE) (y/n): " confirm_setup
+    if [[ ! "$confirm_setup" =~ ^[Yy]$ ]]; then
+        echo -e "${RED}[INFO] Installation aborted by user.${NC}"
+        exit 0
+    fi
+fi
+
 # 1. Detect/Install AUR Helper (yay/paru)
 echo -e "\n${BLUE}${BOLD}[1/5] Checking for AUR helper (yay/paru)...${NC}"
 AUR_HELPER=""
@@ -1750,15 +1760,27 @@ MONEOF
 fi
 
 # Touchpad scrolling behavior setup (Windows vs Linux default)
-if [ -n "$WAYLAND_DISPLAY" ] || [ -n "$DISPLAY" ]; then
-    if zenity --question \
-        --title="Touchpad Scrolling Direction" \
-        --text="Do you have a touchpad on this device?\nWould you like to configure touchpad scrolling to behave like Windows (Standard Scrolling)?" \
-        --ok-label="Yes (Windows Style)" \
-        --cancel-label="No (Linux Natural Scroll)" \
-        --width=400 2>/dev/null; then
-        
-        echo -e "${CYAN}Configuring touchpad to use Windows-style standard scrolling...${NC}"
+IS_LAPTOP=false
+if [ -f /sys/class/dmi/id/chassis_type ]; then
+    CHASSIS=$(cat /sys/class/dmi/id/chassis_type)
+    if [[ "$CHASSIS" =~ ^(8|9|10|11|14)$ ]]; then
+        IS_LAPTOP=true
+    fi
+fi
+if [ -d /sys/class/power_supply ] && ls /sys/class/power_supply/ | grep -q "^BAT"; then
+    IS_LAPTOP=true
+fi
+
+HAS_TOUCHPAD=false
+if grep -iq "touchpad" /proc/bus/input/devices 2>/dev/null; then
+    HAS_TOUCHPAD=true
+fi
+
+if [ "$IS_LAPTOP" = "true" ] || [ "$HAS_TOUCHPAD" = "true" ]; then
+    echo -e "\n${YELLOW}[PROMPT] Laptop/Touchpad detected on this device.${NC}"
+    read -p "Touch pad like windows? (y/n): " tp_windows_choice
+    if [[ "$tp_windows_choice" =~ ^[Yy]$ ]]; then
+        echo -e "${CYAN}Configuring touchpad to behave like Windows (Standard Scrolling)...${NC}"
         mkdir -p "$HOME/.config/hypr"
         touch "$HOME/.config/hypr/userprefs.conf"
         if grep -q "touchpad" "$HOME/.config/hypr/userprefs.conf"; then
@@ -1779,6 +1801,8 @@ EOF
         fi
         hyprctl keyword input:touchpad:natural_scroll false &>/dev/null || true
         echo -e "${GREEN}[OK] Touchpad scrolling configured like Windows successfully!${NC}"
+    else
+        echo -e "${BLUE}[INFO] Keeping Linux natural scrolling default.${NC}"
     fi
 fi
 
