@@ -649,9 +649,27 @@ def set_mouse_sensitivity(value):
         if re.search(pattern, content, re.MULTILINE):
             new_content = re.sub(pattern, rf'\g<1>{value:.2f}', content, flags=re.MULTILINE)
         else:
-            input_pattern = r'(input\s*\{[^}]*)'
-            if re.search(input_pattern, content):
-                new_content = re.sub(input_pattern, rf'\g<1>\n    sensitivity = {value:.2f}', content)
+            match = re.search(r'input\s*\{', content)
+            if match:
+                start_idx = match.end()
+                brace_count = 1
+                end_idx = -1
+                for i in range(start_idx, len(content)):
+                    if content[i] == '{':
+                        brace_count += 1
+                    elif content[i] == '}':
+                        brace_count -= 1
+                        if brace_count == 0:
+                            end_idx = i
+                            break
+                if end_idx != -1:
+                    before = content[:end_idx]
+                    after = content[end_idx:]
+                    if before and not before.endswith('\n'):
+                        before += '\n'
+                    new_content = before + f"    sensitivity = {value:.2f}\n" + after
+                else:
+                    new_content = content + f"\ninput {{\n    sensitivity = {value:.2f}\n}}\n"
             else:
                 new_content = content + f"\ninput {{\n    sensitivity = {value:.2f}\n}}\n"
                 
@@ -688,15 +706,53 @@ def set_touchpad_natural_scroll(enabled):
         if re.search(touchpad_pattern, content):
             new_content = re.sub(touchpad_pattern, rf'\g<1>{"true" if enabled else "false"}', content)
         else:
-            input_pattern = r'(input\s*\{[^}]*)'
-            if re.search(input_pattern, content):
-                touchpad_block_pattern = r'(touchpad\s*\{)'
-                if re.search(touchpad_block_pattern, content):
-                    new_content = re.sub(touchpad_block_pattern, rf'\1\n        natural_scroll = {"true" if enabled else "false"}', content)
+            touchpad_block_pattern = r'touchpad\s*\{'
+            match_tp = re.search(touchpad_block_pattern, content)
+            if match_tp:
+                start_idx = match_tp.end()
+                brace_count = 1
+                end_idx = -1
+                for i in range(start_idx, len(content)):
+                    if content[i] == '{':
+                        brace_count += 1
+                    elif content[i] == '}':
+                        brace_count -= 1
+                        if brace_count == 0:
+                            end_idx = i
+                            break
+                if end_idx != -1:
+                    before = content[:end_idx]
+                    after = content[end_idx:]
+                    if before and not before.endswith('\n'):
+                        before += '\n'
+                    new_content = before + f"        natural_scroll = {'true' if enabled else 'false'}\n" + after
                 else:
-                    new_content = re.sub(input_pattern, rf'\g<1>\n    touchpad {{\n        natural_scroll = {"true" if enabled else "false"}\n    }}', content)
+                    new_content = content + f"\ninput {{\n    touchpad {{\n        natural_scroll = {'true' if enabled else 'false'}\n    }}\n}}\n"
             else:
-                new_content = content + f"\ninput {{\n    touchpad {{\n        natural_scroll = {"true" if enabled else "false"}\n    }}\n}}\n"
+                match_in = re.search(r'input\s*\{', content)
+                if match_in:
+                    start_idx = match_in.end()
+                    brace_count = 1
+                    end_idx = -1
+                    for i in range(start_idx, len(content)):
+                        if content[i] == '{':
+                            brace_count += 1
+                        elif content[i] == '}':
+                            brace_count -= 1
+                            if brace_count == 0:
+                                end_idx = i
+                                break
+                    if end_idx != -1:
+                        before = content[:end_idx]
+                        after = content[end_idx:]
+                        if before and not before.endswith('\n'):
+                            before += '\n'
+                        tp_block = f"    touchpad {{\n        natural_scroll = {'true' if enabled else 'false'}\n    }}\n"
+                        new_content = before + tp_block + after
+                    else:
+                        new_content = content + f"\ninput {{\n    touchpad {{\n        natural_scroll = {'true' if enabled else 'false'}\n    }}\n}}\n"
+                else:
+                    new_content = content + f"\ninput {{\n    touchpad {{\n        natural_scroll = {'true' if enabled else 'false'}\n    }}\n}}\n"
                 
         with open(USERPREFS_CONF, 'w') as f:
             f.write(new_content)
