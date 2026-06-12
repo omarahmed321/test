@@ -1297,7 +1297,7 @@ master {
 # See https://wiki.hyprland.org/Configuring/Variables/
 
 misc {
-    vrr = 1
+    vrr = 2
     disable_hyprland_logo = true
     disable_splash_rendering = true
     force_default_wallpaper = 0
@@ -1819,6 +1819,26 @@ if [ -z "$MONITOR_CONFIGS" ]; then
         # Extreme fallback
         MONITOR_CONFIGS="monitor = ,preferred,auto,1"
         WORKSPACE_RULES="# Workspace Rules\nworkspace = 1, monitor:, default:true"
+    fi
+fi
+
+# Override offsets if they already exist in the user's config (so we don't reset them)
+if [ -n "$SIDE_NAME" ] && [ -f "$HOME/.config/hypr/monitors.conf" ]; then
+    # Match the main monitor config line to extract XxY coordinates
+    EXISTING_LINE=$(grep -E "^\s*monitor\s*=\s*${MAIN_NAME}\s*," "$HOME/.config/hypr/monitors.conf" | head -n 1)
+    if [ -n "$EXISTING_LINE" ]; then
+        POS_FIELD=$(echo "$EXISTING_LINE" | cut -d',' -f3 | tr -d '[:space:]')
+        if [[ "$POS_FIELD" =~ ^([0-9]+)x([0-9]+)$ ]]; then
+            EXISTING_X="${BASH_REMATCH[1]}"
+            EXISTING_Y="${BASH_REMATCH[2]}"
+            echo -e "${GREEN}[INFO] Preserving existing monitor offset: ${EXISTING_X}x${EXISTING_Y}${NC}"
+            OFFSET_X=$EXISTING_X
+            OFFSET_Y=$EXISTING_Y
+            
+            # Re-generate MONITOR_CONFIGS with the preserved offsets
+            MONITOR_CONFIGS="monitor = ${SIDE_NAME},${SIDE_WIDTH}x${SIDE_HEIGHT}@${SIDE_HZ},0x0,1,transform,1\n"
+            MONITOR_CONFIGS="${MONITOR_CONFIGS}monitor = ${MAIN_NAME},${MAIN_WIDTH}x${MAIN_HEIGHT}@${MAIN_HZ},${OFFSET_X}x${OFFSET_Y},1"
+        fi
     fi
 fi
 
