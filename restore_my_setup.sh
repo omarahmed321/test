@@ -1210,7 +1210,6 @@ exec-once = dbus-update-activation-environment --systemd --all # for XDPH
 exec-once = systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP # for XDPH
 exec-once = $scrPath/polkitkdeauth.sh # authentication dialogue for GUI apps
 exec-once = sleep 2 && env reload_flag=1 $scrPath/wbarconfgen.sh # launch the system bar
-exec-once = $HOME/.config/hypr/reset_cursor.sh # clear login manager ghost cursor
 exec-once = blueman-applet # systray app for Bluetooth
 exec-once = udiskie --no-automount --smart-tray # front-end that allows to manage removable media
 exec-once = nm-applet --indicator # systray app for Network/Wifi
@@ -1998,7 +1997,7 @@ env = __GL_VRR_ALLOWED,1
 env = WLR_DRM_NO_ATOMIC,1
 
 cursor {
-    no_hardware_cursors = true
+    no_hardware_cursors = false
 }
 EOF
 
@@ -2022,68 +2021,6 @@ else
 fi
 EOF
 chmod +x "$HOME/.config/hypr/close_kitty_or_copy.sh"
-
-# --- WRITE ~/.config/hypr/reset_cursor.sh ---
-echo -e "${CYAN}Writing ~/.config/hypr/reset_cursor.sh...${NC}"
-cat << 'EOF' > "$HOME/.config/hypr/reset_cursor.sh"
-#!/bin/bash
-# Wait for the session to fully initialize
-LOG_FILE="/tmp/reset_cursor.log"
-echo "--- Reset Cursor Script Started at $(date) ---" > "$LOG_FILE"
-
-sleep 6
-echo "Sleeping done. Current cursorpos: $(hyprctl cursorpos)" >> "$LOG_FILE"
-
-# Save original cursor position
-orig=$(hyprctl cursorpos | tr -d ' ')
-orig_x=$(echo "$orig" | cut -d',' -f1)
-orig_y=$(echo "$orig" | cut -d',' -f2)
-
-echo "Saved original position: $orig_x, $orig_y" >> "$LOG_FILE"
-
-# Touch the four corners of each monitor to force cursor plane redraw
-hyprctl monitors -j | jq -r '.[] | "\(.x) \(.y) \(.width) \(.height) \(.transform)"' | while read -r mx my mw mh mt; do
-    if [ "$mt" -eq 1 ] || [ "$mt" -eq 3 ]; then
-        w=$mh
-        h=$mw
-    else
-        w=$mw
-        h=$mh
-    fi
-    
-    # Calculate corners
-    c1_x=$((mx + 10))
-    c1_y=$((my + 10))
-    
-    c2_x=$((mx + w - 10))
-    c2_y=$((my + 10))
-    
-    c3_x=$((mx + 10))
-    c3_y=$((my + h - 10))
-    
-    c4_x=$((mx + w - 10))
-    c4_y=$((my + h - 10))
-    
-    echo "Monitor: x=$mx, y=$my, w=$w, h=$h. Moving to corners: ($c1_x, $c1_y), ($c2_x, $c2_y), ($c3_x, $c3_y), ($c4_x, $c4_y)" >> "$LOG_FILE"
-    
-    # Move cursor to all 4 corners
-    hyprctl dispatch movecursor "$c1_x" "$c1_y" >> "$LOG_FILE" 2>&1
-    sleep 0.05
-    hyprctl dispatch movecursor "$c2_x" "$c2_y" >> "$LOG_FILE" 2>&1
-    sleep 0.05
-    hyprctl dispatch movecursor "$c3_x" "$c3_y" >> "$LOG_FILE" 2>&1
-    sleep 0.05
-    hyprctl dispatch movecursor "$c4_x" "$c4_y" >> "$LOG_FILE" 2>&1
-    sleep 0.05
-done
-
-# Restore original cursor position
-echo "Restoring to original position: $orig_x, $orig_y" >> "$LOG_FILE"
-hyprctl dispatch movecursor "$orig_x" "$orig_y" >> "$LOG_FILE" 2>&1
-
-echo "--- Reset Cursor Script Finished at $(date) ---" >> "$LOG_FILE"
-EOF
-chmod +x "$HOME/.config/hypr/reset_cursor.sh"
 
 # --- WRITE ~/.config/kitty/kitty.conf ---
 echo -e "${CYAN}Writing ~/.config/kitty/kitty.conf...${NC}"
