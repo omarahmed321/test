@@ -1348,7 +1348,7 @@ cat << 'EOF' > "$HOME/.config/hypr/userprefs.conf"
 
 decoration {
     shadow {
-        enabled = false
+        enabled = true
         range = 18
         render_power = 4
         color = rgba(8ec07cff)
@@ -1670,6 +1670,49 @@ layerrule = ignore_alpha 1, match:namespace swaync-control-center
 layerrule = blur 1, match:namespace logout_dialog
 EOF
 
+# --- WRITE ~/.config/hypr/animations/animations-smooth.conf ---
+echo -e "${CYAN}Writing ~/.config/hypr/animations/animations-smooth.conf...${NC}"
+mkdir -p "$HOME/.config/hypr/animations"
+cat << 'EOF' > "$HOME/.config/hypr/animations/animations-smooth.conf"
+# ----------------------------------------------------- 
+# ▄▀█ █▄░█ █ █▀▄▀█ ▄▀█ ▀█▀ █ █▀█ █▄░█
+# █▀█ █░▀█ █ █░▀░█ █▀█ ░█░ █ █▄█ █░▀█
+#
+# name "Buttery Smooth"
+# ----------------------------------------------------- 
+
+animations {
+    enabled = yes
+    
+    # Custom Bezier Curves for Fluent & Fluid Animations
+    bezier = fluent_decel, 0.1, 1.0, 0.0, 1.0
+    bezier = fluent_accel, 0.9, 0.0, 0.8, 0.15
+    bezier = easeOutExpo, 0.16, 1.0, 0.3, 1.0
+    bezier = easeOutCirc, 0.0, 0.55, 0.45, 1.0
+    bezier = winIn, 0.1, 1.0, 0.1, 1.0
+    bezier = winOut, 0.2, -0.1, 0.0, 1.0
+    
+    # Window transitions
+    animation = windows, 1, 3.2, easeOutExpo, popin 60%
+    animation = windowsIn, 1, 3.2, winIn, popin 60%
+    animation = windowsOut, 1, 3.0, winOut, popin 60%
+    animation = windowsMove, 1, 3.2, easeOutExpo, slide
+    
+    # Fade transitions
+    animation = fade, 1, 2.5, fluent_decel
+    animation = fadeLayersIn, 1, 2.0, fluent_decel
+    animation = fadeLayersOut, 1, 2.5, fluent_decel
+    
+    # Workspace & Tab Switching (Very smooth slide and fade)
+    animation = workspaces, 1, 3.8, easeOutExpo, slidefade 20%
+    animation = specialWorkspace, 1, 3.0, easeOutExpo, slidevert
+    
+    # Border animations
+    animation = border, 1, 1, default
+    animation = borderangle, 1, 30, default, once
+}
+EOF
+
 # --- WRITE ~/.config/hypr/animations.conf ---
 echo -e "${CYAN}Writing ~/.config/hypr/animations.conf...${NC}"
 cat << 'EOF' > "$HOME/.config/hypr/animations.conf"
@@ -1683,7 +1726,7 @@ cat << 'EOF' > "$HOME/.config/hypr/animations.conf"
 layerrule = no_anim on, match:namespace hyprpicker
 layerrule = no_anim on, match:namespace selection
 
-source = ~/.config/hypr/animations/animations-default.conf
+source = ~/.config/hypr/animations/animations-smooth.conf
 EOF
 
 # --- WRITE ~/.config/hypr/monitors.conf (DYNAMIC DETECTION) ---
