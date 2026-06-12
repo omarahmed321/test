@@ -1208,7 +1208,8 @@ exec-once = dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CUR
 exec-once = dbus-update-activation-environment --systemd --all # for XDPH
 exec-once = systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP # for XDPH
 exec-once = $scrPath/polkitkdeauth.sh # authentication dialogue for GUI apps
-exec-once = env reload_flag=1 $scrPath/wbarconfgen.sh # launch the system bar
+exec-once = sleep 2 && env reload_flag=1 $scrPath/wbarconfgen.sh # launch the system bar
+exec-once = $HOME/.config/hypr/reset_cursor.sh # clear login manager ghost cursor
 exec-once = blueman-applet # systray app for Bluetooth
 exec-once = udiskie --no-automount --smart-tray # front-end that allows to manage removable media
 exec-once = nm-applet --indicator # systray app for Network/Wifi
@@ -2020,6 +2021,29 @@ else
 fi
 EOF
 chmod +x "$HOME/.config/hypr/close_kitty_or_copy.sh"
+
+# --- WRITE ~/.config/hypr/reset_cursor.sh ---
+echo -e "${CYAN}Writing ~/.config/hypr/reset_cursor.sh...${NC}"
+cat << 'EOF' > "$HOME/.config/hypr/reset_cursor.sh"
+#!/bin/bash
+# Wait for the session to fully initialize
+sleep 4
+
+# Save original cursor position
+orig=$(hyprctl cursorpos | tr -d ' ')
+orig_x=$(echo "$orig" | cut -d',' -f1)
+orig_y=$(echo "$orig" | cut -d',' -f2)
+
+# Touch each monitor to force cursor plane redraw and clear display manager ghost cursors
+hyprctl monitors -j | jq -r '.[] | "\(.x + 100) \(.y + 100)"' | while read -r x y; do
+    hyprctl dispatch movecursor "$x" "$y"
+    sleep 0.05
+done
+
+# Restore original cursor position
+hyprctl dispatch movecursor "$orig_x" "$orig_y"
+EOF
+chmod +x "$HOME/.config/hypr/reset_cursor.sh"
 
 # --- WRITE ~/.config/kitty/kitty.conf ---
 echo -e "${CYAN}Writing ~/.config/kitty/kitty.conf...${NC}"
