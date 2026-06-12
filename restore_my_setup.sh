@@ -1190,6 +1190,10 @@ cat << 'EOF' > "$HOME/.config/hypr/hyprland.conf"
 
 $scrPath = $HOME/.local/share/bin # set scripts path
 
+# Default cursor theme and size
+$CURSOR_THEME = Bibata-Modern-Ice
+$CURSOR_SIZE = 20
+
 
 # █▀▄▀█ █▀█ █▄░█ █ ▀█▀ █▀█ █▀█
 # █░▀░█ █▄█ █░▀█ █ ░█░ █▄█ █▀▄
@@ -1219,7 +1223,6 @@ exec-once = wl-paste --type image --watch cliphist store # clipboard store image
 exec-once = $scrPath/swwwallpaper.sh # start wallpaper daemon
 exec-once = $scrPath/batterynotify.sh # battery notification
 exec-once = hyprsunset -t 3500 # night light (warmer temperature for better blue light filtering)
-exec-once = hyprctl setcursor Bibata-Modern-Ice 20
 
 
 # █▀▀ █▄░█ █░█
@@ -1237,8 +1240,6 @@ env = QT_WAYLAND_DISABLE_WINDOWDECORATION,1
 env = QT_AUTO_SCREEN_SCALE_FACTOR,1
 env = MOZ_ENABLE_WAYLAND,1
 env = GDK_SCALE,1
-env = XCURSOR_THEME,Bibata-Modern-Ice
-env = XCURSOR_SIZE,20
 
 
 # █ █▄░█ █▀█ █░█ ▀█▀
@@ -1319,6 +1320,12 @@ source = ~/.config/hypr/themes/common.conf # shared theme settings
 # hyprlang noerror true
 source = ~/.config/hypr/themes/theme.conf # theme specific settings
 # hyprlang noerror false
+
+# Setup cursor theme environment variables dynamically based on active theme
+env = XCURSOR_THEME,$CURSOR_THEME
+env = XCURSOR_SIZE,$CURSOR_SIZE
+env = HYPRCURSOR_THEME,$CURSOR_THEME
+env = HYPRCURSOR_SIZE,$CURSOR_SIZE
 source = ~/.config/hypr/themes/colors.conf # wallbash color override
 source = ~/.config/hypr/monitors.conf # initially empty, to be configured by user and remains static
 source = ~/.config/hypr/userprefs.conf # initially empty, to be configured by user and remains static
@@ -1994,7 +2001,6 @@ cat << 'EOF' > "$HOME/.config/hypr/nvidia.conf"
 env = LIBVA_DRIVER_NAME,nvidia
 env = __GLX_VENDOR_LIBRARY_NAME,nvidia
 env = __GL_VRR_ALLOWED,1
-env = WLR_DRM_NO_ATOMIC,1
 
 cursor {
     no_hardware_cursors = false
@@ -3079,10 +3085,12 @@ if [ -f "$HOME/hyde/Scripts/themepatcher.lst" ] && [ -f "$HOME/hyde/Scripts/them
     echo -e "${GREEN}[OK] All preset HyDE themes installed and patched successfully!${NC}"
 fi
 
-# Force the 'Gruvbox Retro' theme to use 'Bibata-Modern-Ice' (white cursor) instead of 'Gruvbox-Retro' (black cursor)
-if [ -f "$HOME/.config/hyde/themes/Gruvbox Retro/hypr.theme" ]; then
-    echo -e "${CYAN}Configuring 'Gruvbox Retro' theme to use 'Bibata-Modern-Ice' (white cursor)...${NC}"
-    sed -i 's/\$CURSOR_THEME = .*/\$CURSOR_THEME = Bibata-Modern-Ice/g' "$HOME/.config/hyde/themes/Gruvbox Retro/hypr.theme"
+# Clean up hardcoded cursor theme lines in common.conf to prevent theme conflicts
+if [ -f "$HOME/.config/hypr/themes/common.conf" ]; then
+    echo -e "${CYAN}Removing hardcoded cursor settings from common.conf...${NC}"
+    sed -i '/exec = hyprctl setcursor/d' "$HOME/.config/hypr/themes/common.conf"
+    sed -i '/exec = gsettings set org.gnome.desktop.interface cursor-theme/d' "$HOME/.config/hypr/themes/common.conf"
+    sed -i '/exec = gsettings set org.gnome.desktop.interface cursor-size/d' "$HOME/.config/hypr/themes/common.conf"
 fi
 
 # 5. Apply Settings and Refresh
