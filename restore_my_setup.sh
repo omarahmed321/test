@@ -552,6 +552,49 @@ def set_mouse_sensitivity(value):
     except Exception:
         return False
 
+def get_touchpad_natural_scroll():
+    if not os.path.exists(USERPREFS_CONF):
+        return True
+    try:
+        with open(USERPREFS_CONF, 'r') as f:
+            content = f.read()
+        match = re.search(r'natural_scroll\s*=\s*(true|false)', content)
+        if match:
+            return match.group(1) == 'true'
+    except Exception:
+        pass
+    return True
+
+def set_touchpad_natural_scroll(enabled):
+    try:
+        os.makedirs(os.path.dirname(USERPREFS_CONF), exist_ok=True)
+        if not os.path.exists(USERPREFS_CONF):
+            with open(USERPREFS_CONF, 'w') as f:
+                f.write("# User Preferences\n")
+        
+        with open(USERPREFS_CONF, 'r') as f:
+            content = f.read()
+        
+        touchpad_pattern = r'(touchpad\s*\{[^}]*natural_scroll\s*=\s*)(true|false)'
+        if re.search(touchpad_pattern, content):
+            new_content = re.sub(touchpad_pattern, rf'\g<1>{"true" if enabled else "false"}', content)
+        else:
+            input_pattern = r'(input\s*\{[^}]*)'
+            if re.search(input_pattern, content):
+                touchpad_block_pattern = r'(touchpad\s*\{)'
+                if re.search(touchpad_block_pattern, content):
+                    new_content = re.sub(touchpad_block_pattern, rf'\1\n        natural_scroll = {"true" if enabled else "false"}', content)
+                else:
+                    new_content = re.sub(input_pattern, rf'\g<1>\n    touchpad {{\n        natural_scroll = {"true" if enabled else "false"}\n    }}', content)
+            else:
+                new_content = content + f"\ninput {{\n    touchpad {{\n        natural_scroll = {"true" if enabled else "false"}\n    }}\n}}\n"
+                
+        with open(USERPREFS_CONF, 'w') as f:
+            f.write(new_content)
+        return True
+    except Exception:
+        return False
+
 def update_monitor_config(name, resolution, hz, scale, extra):
     try:
         os.makedirs(os.path.dirname(MONITORS_CONF), exist_ok=True)
@@ -685,6 +728,18 @@ class DisplaySettingsApp(tk.Tk):
         # Accel Note
         ttk.Label(mouse_frame, text="* Accel profile is forced to 'flat' to ensure raw mouse precision.", foreground='#a89984').pack(anchor='w', padx=15, pady=10)
 
+        # Touchpad Settings Separator
+        ttk.Separator(mouse_frame, orient='horizontal').pack(fill='x', padx=15, pady=15)
+        
+        ttk.Label(mouse_frame, text="Touchpad Settings:", font=('JetBrains Mono', 11, 'bold')).pack(anchor='w', padx=15, pady=5)
+        
+        self.touchpad_var = tk.BooleanVar(value=not get_touchpad_natural_scroll())
+        self.touchpad_check = ttk.Checkbutton(
+            mouse_frame, text="Windows-style Touchpad Scrolling (Reverse/Standard)",
+            variable=self.touchpad_var
+        )
+        self.touchpad_check.pack(anchor='w', padx=20, pady=10)
+
         # --- BOTTOM ACTION PANEL ---
         btn_frame = ttk.Frame(self)
         btn_frame.pack(fill='x', side='bottom', padx=15, pady=15)
@@ -807,11 +862,22 @@ class DisplaySettingsApp(tk.Tk):
         except Exception as e:
             messagebox.showerror("Error", f"Failed to apply mouse sensitivity: {e}")
             return
+
+        # 3. Update Touchpad Scrolling Direction
+        touchpad_windows_style = self.touchpad_var.get()
+        natural_scroll = not touchpad_windows_style
+        try:
+            subprocess.run(['hyprctl', 'keyword', 'input:touchpad:natural_scroll', 'true' if natural_scroll else 'false'], check=True)
+            set_touchpad_natural_scroll(natural_scroll)
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to apply touchpad settings: {e}")
+            return
             
         messagebox.showinfo("Success", "Settings applied and saved successfully!")
         
         self.monitors = get_monitor_info()
         self.current_sens = get_mouse_sensitivity()
+        self.touchpad_var.set(not get_touchpad_natural_scroll())
 
 if __name__ == "__main__":
     if not os.environ.get('WAYLAND_DISPLAY'):
@@ -1680,6 +1746,39 @@ MONEOF
                 esac
             done
         fi
+    fi
+fi
+
+# Touchpad scrolling behavior setup (Windows vs Linux default)
+if [ -n "$WAYLAND_DISPLAY" ] || [ -n "$DISPLAY" ]; then
+    if zenity --question \
+        --title="Touchpad Scrolling Direction" \
+        --text="Do you have a touchpad on this device?\nWould you like to configure touchpad scrolling to behave like Windows (Standard Scrolling)?" \
+        --ok-label="Yes (Windows Style)" \
+        --cancel-label="No (Linux Natural Scroll)" \
+        --width=400 2>/dev/null; then
+        
+        echo -e "${CYAN}Configuring touchpad to use Windows-style standard scrolling...${NC}"
+        mkdir -p "$HOME/.config/hypr"
+        touch "$HOME/.config/hypr/userprefs.conf"
+        if grep -q "touchpad" "$HOME/.config/hypr/userprefs.conf"; then
+            if grep -q "natural_scroll" "$HOME/.config/hypr/userprefs.conf"; then
+                sed -i 's/natural_scroll.*/natural_scroll = false/' "$HOME/.config/hypr/userprefs.conf"
+            else
+                sed -i '/touchpad {/a \ \ \ \ \ \ \ \ natural_scroll = false' "$HOME/.config/hypr/userprefs.conf"
+            fi
+        else
+            cat << 'EOF' >> "$HOME/.config/hypr/userprefs.conf"
+
+input {
+    touchpad {
+        natural_scroll = false
+    }
+}
+EOF
+        fi
+        hyprctl keyword input:touchpad:natural_scroll false &>/dev/null || true
+        echo -e "${GREEN}[OK] Touchpad scrolling configured like Windows successfully!${NC}"
     fi
 fi
 
