@@ -2238,6 +2238,46 @@ layerrule = ignore_alpha 1, match:namespace swaync-control-center
 layerrule = blur 1, match:namespace logout_dialog
 EOF
 
+# --- WRITE ~/.config/hypr/animations/animations-velocity.conf ---
+echo -e "${CYAN}Writing ~/.config/hypr/animations/animations-velocity.conf...${NC}"
+mkdir -p "$HOME/.config/hypr/animations"
+cat << 'EOF' > "$HOME/.config/hypr/animations/animations-velocity.conf"
+# ----------------------------------------------------- 
+# ▄▀█ █▄░█ █ █▀▄▀█ ▄▀█ ▀█▀ █ █▀█ █▄░█
+# █▀█ █░▀█ █ █░▀░█ █▀█ ░█░ █ █▄█ █░▀█
+#
+# name "Velocity (Snappy & Fluid)"
+# ----------------------------------------------------- 
+
+animations {
+    enabled = yes
+    
+    # snappiest deceleration curve: explosive start, silky-smooth finish
+    bezier = snappy_decel, 0.05, 0.9, 0.05, 1.0
+    bezier = snappy_ease, 0.15, 0.85, 0.1, 1.0
+    bezier = micro_bounce, 0.15, 1.1, 0.1, 1.0
+    
+    # Windows: Pop-in from 85% scale with a snappy deceleration curve
+    animation = windows, 1, 2.2, snappy_decel, popin 85%
+    animation = windowsIn, 1, 2.0, micro_bounce, popin 85%
+    animation = windowsOut, 1, 1.8, snappy_decel, popin 85%
+    animation = windowsMove, 1, 2.2, snappy_decel, slide
+    
+    # Fade transitions: ultra snappy
+    animation = fade, 1, 1.5, snappy_ease
+    animation = fadeLayersIn, 1, 1.5, snappy_ease
+    animation = fadeLayersOut, 1, 1.8, snappy_ease
+    
+    # Workspaces: snappiest horizontal slide & fade
+    animation = workspaces, 1, 2.4, snappy_decel, slidefade 15%
+    animation = specialWorkspace, 1, 2.2, snappy_decel, slidevert
+    
+    # Border & borderangle
+    animation = border, 1, 1, default
+    animation = borderangle, 1, 20, snappy_decel, once
+}
+EOF
+
 # --- WRITE ~/.config/hypr/animations.conf ---
 echo -e "${CYAN}Writing ~/.config/hypr/animations.conf...${NC}"
 cat << 'EOF' > "$HOME/.config/hypr/animations.conf"
@@ -2251,7 +2291,7 @@ cat << 'EOF' > "$HOME/.config/hypr/animations.conf"
 layerrule = no_anim on, match:namespace hyprpicker
 layerrule = no_anim on, match:namespace selection
 
-source = ~/.config/hypr/animations/animations-default.conf
+source = ~/.config/hypr/animations/animations-velocity.conf
 EOF
 
 # --- WRITE ~/.config/hypr/monitors.conf (DYNAMIC DETECTION) ---
