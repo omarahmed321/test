@@ -122,3 +122,41 @@ When you clone this repository, you will find the following files:
 | **`ara-custom`** | **Custom keyboard layout reference.** Maps the Arabic letter `ذ` (Thal) to the backslash (`\`) key for natural Arabic typing. |
 | **`ioctl_cfg80211_patched.c`** | **Patched source reference.** Backup of the patched wireless driver configuration interfaces. |
 | **`README.md`** | **Documentation.** This file. |
+
+---
+
+## ⚙️ Detailed Configuration Files Deployed
+
+The restore script deploys and configures the following files on your system:
+
+### 1. Hyprland Configuration (`~/.config/hypr/`)
+- **`hyprland.conf`**: The main compositor entry point. Sources modular configs (`nvidia.conf`, `keybindings.conf`, `windowrules.conf`, `userprefs.conf`) and imports Wayland-specific systemd environments.
+- **`userprefs.conf`**: Customizes system preferences:
+  - **Shadows**: Accent border shadow enabled (`#8ec07cff`).
+  - **Input**: Dual keyboard layouts (`us, ara` with a custom Arabic `thal_bksl` variant allowing the `ذ` key to map to backslash, toggled via `Alt+Shift`), mouse sensitivity `-0.5`, flat acceleration curve, and auto-starts the gnome keyring daemon.
+- **`nvidia.conf`**: Defines necessary environment variables for Nvidia GPU configurations on Wayland (`__GLX_VENDOR_LIBRARY_NAME,nvidia`, `GBM_BACKEND,nvidia-drm`, `LIBVA_DRIVER_NAME,nvidia`).
+- **`keybindings.conf`**: Adds convenient global keyboard shortcuts:
+  - **Apps**: `Super + F` (Firefox), `Super + C` (VS Code), `Super + E` (Dolphin).
+  - **GUI Controls**: `Super + Alt + N` (Night Light GUI), `Super + Alt + D` (Display & Mouse settings GUI).
+  - **Media**: System audio, brightness, and player controls mapped to physical media keys.
+- **`windowrules.conf`**: Styles application window rules, layout settings, custom transparency behaviors for popups, and disables active compositor animations for specific tools like color pickers (`hyprpicker`) or screenshot areas.
+- **`sync_cursor.sh`**: Shell daemon to sync cursor sizes and icon paths between Hyprland, X11, and GTK interfaces.
+- **`close_kitty_or_copy.sh`**: Intelligent script bound to `Ctrl+C` inside the terminal to copy selected text if present, or send an interrupt signal.
+
+### 2. Kitty Terminal Configuration (`~/.config/kitty/`)
+- **`kitty.conf`**: Configures the terminal emulator and sources `userprefs.conf`.
+- **`userprefs.conf`**: Adds copy-on-select integration, binds `Ctrl+Backspace` for natural word deletion, and sets terminal text scale (`13.0`). Keep terminal cursor animations fully default.
+
+### 3. Waybar Configuration (`~/.config/waybar/`)
+- **`config.jsonc` & `style.css`**: Renders a highly responsive status bar at the top of the monitor displaying workspaces, current active window, system performance indicators (RAM, CPU), sound, date, and quick action system tray icons.
+
+### 4. Zsh & System Info (`~/.zshrc` & `~/.config/fastfetch/`)
+- **`~/.zshrc`**: Configures Oh My Zsh shell with zsh auto-suggestions, syntax-highlighting, and the Powerlevel10k custom theme.
+- **`fastfetch/config.jsonc` & `logo.txt`**: Prints hardware diagnostic information alongside a custom braille anime logo on terminal startup.
+
+### 5. VS Code Configuration (`~/.config/Code/User/settings.json`)
+- Syncs settings to use the `Gruvbox Material Dark` theme, `Material Icon Theme`, disables minimap visualizers, configures tab size `4`, and auto-formats code on save.
+
+### 6. Cava Visualizer Configuration (`~/.config/cava/config`)
+- Configures the terminal audio visualizer with precise framerate adjustments and equalizer curves.
+
