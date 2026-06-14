@@ -1117,20 +1117,20 @@ CSS = """
 window.nightlight-window { background-color: transparent; }
 
 .nightlight-card {
-    background: alpha(@window_bg_color, 0.94);
-    border-radius: 20px;
+    background: alpha(@window_bg_color, 0.95);
+    border-radius: 24px;
     border: 1px solid alpha(@window_fg_color, 0.08);
-    padding: 30px 26px 22px 26px;
-    box-shadow: 0 10px 40px alpha(black, 0.40);
+    padding: 28px 24px 24px 24px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
 }
 
 /* ── Setup-mode banner ──────────────────────────────────────────────── */
 .setup-banner {
-    background: linear-gradient(135deg, alpha(#ff9240, 0.18), alpha(#ff5722, 0.08));
-    border-radius: 12px;
-    border: 1px solid alpha(#ff9240, 0.30);
-    padding: 12px 16px;
-    margin-bottom: 18px;
+    background: linear-gradient(135deg, alpha(#ff9240, 0.12), alpha(#ff5722, 0.05));
+    border-radius: 14px;
+    border: 1px solid alpha(#ff9240, 0.25);
+    padding: 14px 18px;
+    margin-bottom: 20px;
 }
 .setup-banner-title {
     font-size: 13px;
@@ -1140,49 +1140,165 @@ window.nightlight-window { background-color: transparent; }
 }
 .setup-banner-body {
     font-size: 11px;
-    opacity: 0.65;
-    margin-top: 2px;
+    opacity: 0.7;
+    margin-top: 4px;
+    line-height: 1.4;
 }
 
 /* ── Typography ─────────────────────────────────────────────────────── */
-.header-icon    { font-size: 44px; }
-.title-label    { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-.subtitle-label { font-size: 12px; opacity: 0.55; margin-top: -4px; }
-.section-label  { font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
-                  opacity: 0.50; margin-top: 14px; }
-.value-badge    { font-size: 28px; font-weight: 900;
+.header-icon    { font-size: 44px; margin-right: 4px; }
+.title-label    { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+.subtitle-label { font-size: 12px; opacity: 0.6; margin-top: -2px; }
+.section-label  { font-size: 11px; font-weight: 800; letter-spacing: 1.5px;
+                  color: @accent_color; opacity: 0.85; margin-top: 18px; margin-bottom: 8px; }
+.value-badge    { font-size: 30px; font-weight: 900;
                   font-variant-numeric: tabular-nums; }
-.unit-label     { font-size: 13px; opacity: 0.5; font-weight: 500;
+.unit-label     { font-size: 14px; opacity: 0.6; font-weight: 600;
                   margin-bottom: 4px; }
-.desc-label     { font-size: 11px; opacity: 0.65; font-style: italic; }
+.desc-label     { font-size: 11px; opacity: 0.7; font-style: italic; }
 
 /* ── Temperature colours ────────────────────────────────────────────── */
-.temp-warm { color: #ff9240; }
-.temp-mid  { color: #ffcc80; }
-.temp-cool { color: #82b1ff; }
+.temp-warm { color: #ff7043; }
+.temp-mid  { color: #ffca28; }
+.temp-cool { color: #29b6f6; }
 
 /* ── Sliders ────────────────────────────────────────────────────────── */
-scale trough        { border-radius: 8px; min-height: 8px; }
-.temp-scale  trough { background: linear-gradient(to right,
-                        #e64a19, #ff9240, #ffcc80, #e3f2fd); }
-.gamma-scale trough { background: linear-gradient(to right,
-                        #37474f, #90a4ae, #eceff1); }
+scale {
+    padding: 10px 0;
+}
+
+scale trough {
+    border-radius: 8px;
+    min-height: 14px;
+    border: 1px solid alpha(@window_fg_color, 0.05);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.temp-scale trough { 
+    background: linear-gradient(to right, #ff3d00, #ff9100, #ffea00, #ffffff, #80d8ff, #29b6f6); 
+}
+
+.gamma-scale trough { 
+    background: linear-gradient(to right, #1a1a1a, #555555, #aaaaaa, #ffffff); 
+}
+
+scale highlight {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+scale slider {
+    background-color: #ffffff;
+    border: 3px solid @accent_color;
+    border-radius: 50%;
+    min-width: 20px;
+    min-height: 20px;
+    margin-top: -4px;
+    margin-bottom: -4px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
+    transition: background-color 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+scale slider:hover {
+    background-color: #f5f5f5;
+    border-color: @accent_bg_color;
+    transform: scale(1.15);
+}
+
+scale slider:focus {
+    border-color: @accent_bg_color;
+}
+
+scale slider:active {
+    background-color: @accent_color;
+    border-color: #ffffff;
+    transform: scale(1.25);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
 
 /* ── Preset grid buttons ────────────────────────────────────────────── */
 .preset-btn {
-    border-radius: 10px;
-    padding: 10px 6px;
-    font-size: 12px;
+    background-color: alpha(@window_fg_color, 0.04);
+    border: 1px solid alpha(@window_fg_color, 0.08);
+    border-radius: 12px;
+    padding: 12px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: @window_fg_color;
+    transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
 }
+
+.preset-btn:hover {
+    background-color: alpha(@window_fg_color, 0.08);
+    border-color: alpha(@window_fg_color, 0.15);
+    transform: translateY(-1px);
+}
+
+.preset-btn:active {
+    background-color: alpha(@window_fg_color, 0.12);
+    transform: translateY(1px);
+}
+
 .preset-btn.active-preset {
-    background: alpha(@accent_color, 0.20);
-    border: 1px solid alpha(@accent_color, 0.60);
-    font-weight: 700;
+    background: linear-gradient(135deg, alpha(@accent_color, 0.25), alpha(@accent_color, 0.15));
+    border: 2px solid @accent_color;
+    color: @accent_color;
+    font-weight: 800;
+    box-shadow: 0 4px 12px alpha(@accent_color, 0.18);
 }
 
 /* ── Action buttons ─────────────────────────────────────────────────── */
-.apply-btn  { font-size: 13px; font-weight: 700; }
-.skip-btn   { font-size: 12px; opacity: 0.65; }
+.suggested-action {
+    background: linear-gradient(135deg, @accent_bg_color, alpha(@accent_bg_color, 0.85));
+    border-radius: 14px;
+    padding: 14px 20px;
+    font-size: 14px;
+    font-weight: 800;
+    color: @accent_fg_color;
+    border: none;
+    box-shadow: 0 4px 15px alpha(@accent_bg_color, 0.35);
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+}
+
+.suggested-action:hover {
+    background: @accent_bg_color;
+    box-shadow: 0 6px 20px alpha(@accent_bg_color, 0.45);
+    transform: translateY(-1px);
+}
+
+.suggested-action:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 8px alpha(@accent_bg_color, 0.25);
+}
+
+.skip-btn {
+    background-color: alpha(@window_fg_color, 0.04);
+    border: 1px solid alpha(@window_fg_color, 0.08);
+    border-radius: 14px;
+    padding: 14px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    color: alpha(@window_fg_color, 0.8);
+    transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
+}
+
+.skip-btn:hover {
+    background-color: alpha(@window_fg_color, 0.08);
+    border-color: alpha(@window_fg_color, 0.15);
+    transform: translateY(-1px);
+}
+
+.skip-btn:active {
+    transform: translateY(1px);
+}
+
+.status-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #4caf50;
+    text-align: center;
+}
 """
 
 PRESETS = [
@@ -1290,14 +1406,11 @@ class NightLightWindow(Adw.ApplicationWindow):
     # ── UI ────────────────────────────────────────────────────────────────────
 
     def _build(self):
-        scroll = Gtk.ScrolledWindow()
-        scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-        self.set_content(scroll)
-
+        # We put outer box directly in content instead of a ScrolledWindow to prevent scrollbars and clipping
         outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        outer.set_margin_top(20);  outer.set_margin_bottom(20)
-        outer.set_margin_start(20); outer.set_margin_end(20)
-        scroll.set_child(outer)
+        outer.set_margin_top(22);  outer.set_margin_bottom(22)
+        outer.set_margin_start(22); outer.set_margin_end(22)
+        self.set_content(outer)
 
         card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         card.add_css_class("nightlight-card")
@@ -1316,7 +1429,7 @@ class NightLightWindow(Adw.ApplicationWindow):
 
             bbody = Gtk.Label(
                 label="Choose a color temperature preset for your display.\n"
-                      "You can always change this later with  Super + Alt + N.")
+                       "You can always change this later with  Super + Alt + N.")
             bbody.set_halign(Gtk.Align.START)
             bbody.set_wrap(True)
             bbody.add_css_class("setup-banner-body")
@@ -1478,7 +1591,7 @@ class NightLightWindow(Adw.ApplicationWindow):
             card.append(sv)
 
         self.sl = Gtk.Label(label="")
-        self.sl.add_css_class("subtitle-label"); self.sl.set_margin_top(8)
+        self.sl.add_css_class("status-label"); self.sl.set_margin_top(8)
         card.append(self.sl)
 
         # Init display
