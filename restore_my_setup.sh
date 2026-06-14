@@ -2238,49 +2238,6 @@ layerrule = ignore_alpha 1, match:namespace swaync-control-center
 layerrule = blur 1, match:namespace logout_dialog
 EOF
 
-# --- WRITE ~/.config/hypr/animations/animations-smooth.conf ---
-echo -e "${CYAN}Writing ~/.config/hypr/animations/animations-smooth.conf...${NC}"
-mkdir -p "$HOME/.config/hypr/animations"
-cat << 'EOF' > "$HOME/.config/hypr/animations/animations-smooth.conf"
-# ----------------------------------------------------- 
-# ▄▀█ █▄░█ █ █▀▄▀█ ▄▀█ ▀█▀ █ █▀█ █▄░█
-# █▀█ █░▀█ █ █░▀░█ █▀█ ░█░ █ █▄█ █░▀█
-#
-# name "Buttery Smooth (Springy)"
-# ----------------------------------------------------- 
-
-animations {
-    enabled = yes
-    
-    # Spring-Overshoot Curve (Tactile and organic spring feedback)
-    bezier = spring, 0.36, 1.1, 0.1, 1.0
-    bezier = fluent_decel, 0.1, 1.0, 0.0, 1.0
-    bezier = fluent_accel, 0.9, 0.0, 0.8, 0.15
-    bezier = easeOutCirc, 0.0, 0.55, 0.45, 1.0
-    bezier = winIn, 0.1, 1.1, 0.1, 1.1
-    bezier = winOut, 0.3, -0.3, 0.0, 1.0
-    
-    # Window transitions (Springy scaling/popin)
-    animation = windows, 1, 4.0, spring, popin 60%
-    animation = windowsIn, 1, 4.0, spring, popin 60%
-    animation = windowsOut, 1, 3.5, winOut, popin 60%
-    animation = windowsMove, 1, 4.0, spring, slide
-    
-    # Fade transitions
-    animation = fade, 1, 2.5, fluent_decel
-    animation = fadeLayersIn, 1, 2.0, fluent_decel
-    animation = fadeLayersOut, 1, 2.5, fluent_decel
-    
-    # Workspace & Tab Switching (Springy slide and fade)
-    animation = workspaces, 1, 4.5, spring, slidefade 20%
-    animation = specialWorkspace, 1, 3.5, spring, slidevert
-    
-    # Border animations
-    animation = border, 1, 1, default
-    animation = borderangle, 1, 30, default, once
-}
-EOF
-
 # --- WRITE ~/.config/hypr/animations.conf ---
 echo -e "${CYAN}Writing ~/.config/hypr/animations.conf...${NC}"
 cat << 'EOF' > "$HOME/.config/hypr/animations.conf"
@@ -2294,7 +2251,7 @@ cat << 'EOF' > "$HOME/.config/hypr/animations.conf"
 layerrule = no_anim on, match:namespace hyprpicker
 layerrule = no_anim on, match:namespace selection
 
-source = ~/.config/hypr/animations/animations-smooth.conf
+source = ~/.config/hypr/animations/animations-default.conf
 EOF
 
 # --- WRITE ~/.config/hypr/monitors.conf (DYNAMIC DETECTION) ---
