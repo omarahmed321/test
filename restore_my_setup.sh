@@ -119,6 +119,18 @@ fi
 
 # 2. Check and Install Required Packages
 echo -e "\n${BLUE}${BOLD}[3/5] Checking and installing required packages...${NC}"
+# Detect GPU Vendor dynamically
+GPU_VENDOR="unknown"
+gpu_info=$(lspci | grep -Ei "vga|3d")
+if echo "$gpu_info" | grep -iq "nvidia"; then
+    GPU_VENDOR="nvidia"
+elif echo "$gpu_info" | grep -iq "amd"; then
+    GPU_VENDOR="amd"
+elif echo "$gpu_info" | grep -iq "intel"; then
+    GPU_VENDOR="intel"
+fi
+echo -e "Detected GPU Vendor: ${CYAN}${GPU_VENDOR}${NC}"
+
 REQUIRED_PACKAGES=(
     hyprland waybar dunst rofi-wayland kitty firefox code dolphin
     swaylock-effects-git wlogout cliphist hyprpicker hyprsunset
@@ -128,7 +140,6 @@ REQUIRED_PACKAGES=(
     nwg-look kvantum kvantum-qt5 qt5ct qt6ct qt5-wayland qt6-wayland
     awww parallel pacman-contrib imagemagick ffmpegthumbs kde-cli-tools
     bc 8188eu-dkms-git antigravity antigravity-ide antigravity-cli prismlauncher cava tk
-
     wtype gnome-keyring ttf-cascadia-code-nerd
     oh-my-zsh-git zsh-theme-powerlevel10k zsh-autosuggestions
     zsh-syntax-highlighting zsh-completions
@@ -136,6 +147,18 @@ REQUIRED_PACKAGES=(
     seahorse networkmanager zenity fastfetch bibata-cursor-theme-bin
     psmisc python dnsmasq hostapd iw sddm ananicy-cpp
 )
+
+# Dynamically add GPU drivers based on detected hardware
+if [ "$GPU_VENDOR" = "nvidia" ]; then
+    echo -e "${CYAN}Adding Nvidia proprietary drivers and Wayland support packages...${NC}"
+    REQUIRED_PACKAGES+=(nvidia-dkms nvidia-utils lib32-nvidia-utils egl-wayland libva-nvidia-driver)
+elif [ "$GPU_VENDOR" = "amd" ]; then
+    echo -e "${CYAN}Adding AMD open-source graphics and Vulkan driver packages...${NC}"
+    REQUIRED_PACKAGES+=(mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon libva-mesa-driver lib32-libva-mesa-driver)
+elif [ "$GPU_VENDOR" = "intel" ]; then
+    echo -e "${CYAN}Adding Intel open-source graphics and Vulkan driver packages...${NC}"
+    REQUIRED_PACKAGES+=(mesa lib32-mesa vulkan-intel lib32-vulkan-intel intel-media-driver)
+fi
 
 # Install packages
 echo -e "${CYAN}Checking ${#REQUIRED_PACKAGES[@]} essential packages...${NC}"
@@ -2004,11 +2027,6 @@ source = ~/.config/hypr/userprefs.conf # initially empty, to be configured by us
 
 # Note: as userprefs.conf is sourced at the end, settings configured in this file will override the defaults
 source = ~/.config/hypr/nvidia.conf # auto sourced vars for nvidia
-
-# Nvidia & Wayland Fixes
-env = LIBVA_DRIVER_NAME,nvidia
-env = GBM_BACKEND,nvidia-drm
-env = __GLX_VENDOR_LIBRARY_NAME,nvidia
 EOF
 
 # --- WRITE ~/.config/hypr/userprefs.conf ---
@@ -2654,7 +2672,8 @@ fi
 
 # --- WRITE ~/.config/hypr/nvidia.conf ---
 echo -e "${CYAN}Writing ~/.config/hypr/nvidia.conf...${NC}"
-cat << 'EOF' > "$HOME/.config/hypr/nvidia.conf"
+if [ "$GPU_VENDOR" = "nvidia" ]; then
+    cat << 'EOF' > "$HOME/.config/hypr/nvidia.conf"
 
 # █▄░█ █░█ █ █▀▄ █ ▄▀█
 # █░▀█ ▀▄▀ █ █▄▀ █ █▀█
@@ -2662,6 +2681,7 @@ cat << 'EOF' > "$HOME/.config/hypr/nvidia.conf"
 # See https://wiki.hyprland.org/Nvidia/
 
 env = LIBVA_DRIVER_NAME,nvidia
+env = GBM_BACKEND,nvidia-drm
 env = __GLX_VENDOR_LIBRARY_NAME,nvidia
 env = __GL_VRR_ALLOWED,1
 
@@ -2669,6 +2689,11 @@ cursor {
     no_hardware_cursors = false
 }
 EOF
+else
+    cat << 'EOF' > "$HOME/.config/hypr/nvidia.conf"
+# Sourced for AMD/Intel GPU - No Nvidia environment variables needed.
+EOF
+fi
 
 # --- WRITE ~/.config/hypr/sync_cursor.sh ---
 echo -e "${CYAN}Writing ~/.config/hypr/sync_cursor.sh...${NC}"
@@ -3789,12 +3814,19 @@ else
 fi
 
 # --- Nvidia DRM Configuration ---
-echo -e "\n${BLUE}${BOLD}Configuring Nvidia DRM modesetting...${NC}"
-echo -e "${CYAN}Setting clean default in /etc/modprobe.d/nvidia.conf...${NC}"
-sudo tee /etc/modprobe.d/nvidia.conf >/dev/null << 'NVIEOF'
+if [ "$GPU_VENDOR" = "nvidia" ]; then
+    echo -e "\n${BLUE}${BOLD}Configuring Nvidia DRM modesetting...${NC}"
+    echo -e "${CYAN}Setting clean default in /etc/modprobe.d/nvidia.conf...${NC}"
+    sudo tee /etc/modprobe.d/nvidia.conf >/dev/null << 'NVIEOF'
 options nvidia_drm modeset=1
 NVIEOF
-echo -e "${GREEN}[OK] Nvidia DRM configured successfully!${NC}"
+    echo -e "${GREEN}[OK] Nvidia DRM configured successfully!${NC}"
+else
+    if [ -f /etc/modprobe.d/nvidia.conf ]; then
+        echo -e "\n${BLUE}${BOLD}Removing Nvidia DRM configuration (non-Nvidia system detected)...${NC}"
+        sudo rm -f /etc/modprobe.d/nvidia.conf
+    fi
+fi
 
 # Robustly clone and patch preset HyDE themes to ensure Waybar theme switches work perfectly out-of-the-box
 if [ -f "$HOME/hyde/Scripts/themepatcher.lst" ] && [ -f "$HOME/hyde/Scripts/themepatcher.sh" ]; then
