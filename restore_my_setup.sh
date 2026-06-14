@@ -1943,12 +1943,13 @@ exec-once = gnome-keyring-daemon --start --components=secrets
 # Configuration for the hyprtrails plugin (Install/enable it by running the commands in the instructions)
 exec-once = hyprpm reload
 
+# hyprlang noerror true
 plugin {
-    hyprlang noerror true
     hyprtrails {
         color = rgba(8ec07cff) # Matches the active green shadow color
     }
 }
+# hyprlang noerror false
 EOF
 
 # --- WRITE ~/.config/hypr/keybindings.conf ---
