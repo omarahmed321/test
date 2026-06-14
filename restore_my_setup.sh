@@ -2252,28 +2252,28 @@ cat << 'EOF' > "$HOME/.config/hypr/animations/animations-velocity.conf"
 animations {
     enabled = yes
     
-    # Ultra-smooth easeOutExpo (starts instantly, silky smooth deceleration)
-    bezier = easeOutExpo, 0.16, 1.0, 0.3, 1.0
-    bezier = easeOutQuint, 0.22, 1.0, 0.36, 1.0
+    # Ultra-smooth fluid deceleration curves
+    bezier = smooth_open, 0.1, 0.9, 0.15, 1.0
+    bezier = smooth_close, 0.15, 0.85, 0.15, 1.0
     
-    # Windows: snappy and elegant slide transitions (no popin/zoom)
-    animation = windows, 1, 2.2, easeOutExpo, slide
-    animation = windowsIn, 1, 2.2, easeOutExpo, slide
-    animation = windowsOut, 1, 1.8, easeOutQuint, slide
-    animation = windowsMove, 1, 2.0, easeOutExpo, slide
+    # Windows: slightly longer duration (3.0) for increased fluidity on open
+    animation = windows, 1, 3.0, smooth_open, slide
+    animation = windowsIn, 1, 3.0, smooth_open, slide
+    animation = windowsOut, 1, 2.5, smooth_close, slide
+    animation = windowsMove, 1, 2.6, smooth_open, slide
     
     # Fade transitions
-    animation = fade, 1, 1.8, easeOutExpo
-    animation = fadeLayersIn, 1, 1.8, easeOutExpo
-    animation = fadeLayersOut, 1, 1.8, easeOutExpo
+    animation = fade, 1, 2.0, smooth_open
+    animation = fadeLayersIn, 1, 2.0, smooth_open
+    animation = fadeLayersOut, 1, 2.0, smooth_open
     
     # Workspaces: smooth slide and fade
-    animation = workspaces, 1, 2.4, easeOutExpo, slidefade 20%
-    animation = specialWorkspace, 1, 2.2, easeOutExpo, slidefadevert 15%
+    animation = workspaces, 1, 2.6, smooth_open, slidefade 20%
+    animation = specialWorkspace, 1, 2.4, smooth_open, slidefadevert 15%
     
     # Border
     animation = border, 1, 1, default
-    animation = borderangle, 1, 20, easeOutExpo, once
+    animation = borderangle, 1, 20, smooth_open, once
 }
 EOF
 
