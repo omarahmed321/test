@@ -105,6 +105,7 @@ The `restore_my_setup.sh` script automates the entire installation and configura
 - **HyDE Framework Setup**: Clones the official `hyprdots` (HyDE) framework, automated using pre-seeded inputs to skip standard installation prompt timers.
 - **Night Light & Display GUI Wizards**: At the end of the installation, graphical setup wizards open automatically to let you configure your display color temperature and monitor layout before the first reboot.
 - **Compositor Animations**: Completely preserves native Hyprland/HyDE default animations and does not overwrite or touch any animation configuration files, letting you manage your curves via the standard HyDE animation selector.
+- **Optional Temporary Lockout Disabler**: Provides an optional prompt at start to temporarily disable the `pam_faillock` account lockout policy (`deny = 0`) during the installation process, preventing frustrating user lockouts if background processes fail authentication, and automatically restores original security configurations from backups before the script completes.
 
 ---
 

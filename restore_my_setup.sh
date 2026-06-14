@@ -46,6 +46,44 @@ if [ -n "$XDG_CURRENT_DESKTOP" ] && [ "$XDG_CURRENT_DESKTOP" != "Hyprland" ]; th
     fi
 fi
 
+# Optional: Temporarily disable pam_faillock account lockout policy during install
+DISABLE_FAILLOCK_OPTION="n"
+read -p "Do you want to temporarily disable the pam_faillock account lockout policy during this installation? (y/n) [n]: " faillock_choice
+if [[ "$faillock_choice" =~ ^[Yy]$ ]]; then
+    DISABLE_FAILLOCK_OPTION="y"
+fi
+
+if [ "$DISABLE_FAILLOCK_OPTION" = "y" ]; then
+    echo -e "\n${BLUE}${BOLD}Temporarily disabling pam_faillock lockout policy (setting deny = 0)...${NC}"
+    FAILLOCK_CONF="/etc/security/faillock.conf"
+    if [ -f "$FAILLOCK_CONF" ]; then
+        if [ ! -f "${FAILLOCK_CONF}.bak" ]; then
+            echo "Creating backup of $FAILLOCK_CONF..."
+            sudo cp "$FAILLOCK_CONF" "${FAILLOCK_CONF}.bak"
+        fi
+        echo "Updating $FAILLOCK_CONF..."
+        if grep -qE '^\s*#?\s*deny\s*=' "$FAILLOCK_CONF"; then
+            sudo sed -i -E 's/^\s*#?\s*deny\s*=\s*[0-9]+/deny = 0/' "$FAILLOCK_CONF"
+        else
+            echo "deny = 0" | sudo tee -a "$FAILLOCK_CONF" >/dev/null
+        fi
+    fi
+    PAM_FILES=("/etc/pam.d/system-auth" "/etc/pam.d/common-auth" "/etc/pam.d/password-auth")
+    for PAM_FILE in "${PAM_FILES[@]}"; do
+        if [ -f "$PAM_FILE" ]; then
+            if grep -q "pam_faillock.so" "$PAM_FILE" && grep -q "deny=" "$PAM_FILE"; then
+                if [ ! -f "${PAM_FILE}.bak" ]; then
+                    echo "Creating backup of $PAM_FILE..."
+                    sudo cp "$PAM_FILE" "${PAM_FILE}.bak"
+                fi
+                echo "Updating inline 'deny' parameter in $PAM_FILE..."
+                sudo sed -i -E '/pam_faillock.so/s/deny=[0-9]+/deny=0/' "$PAM_FILE"
+            fi
+        fi
+    done
+    echo -e "${GREEN}[OK] pam_faillock lockout policy disabled successfully.${NC}"
+fi
+
 # 1. Detect/Install AUR Helper (yay/paru)
 echo -e "\n${BLUE}${BOLD}[1/5] Checking for AUR helper (yay/paru)...${NC}"
 AUR_HELPER=""
@@ -3868,6 +3906,24 @@ if [ -n "$WAYLAND_DISPLAY" ] || [ -n "$DISPLAY" ]; then
     echo -e "${MAGENTA}│  You can always reopen it later with:  Super + Alt + N   ${MAGENTA}│${NC}"
     echo -e "${MAGENTA}${BOLD}└──────────────────────────────────────────────────────────┘${NC}"
     python3 "$HOME/.local/share/bin/nightlight-gui.py" --setup || true
+fi
+
+# --- Restore pam_faillock settings if they were temporarily disabled ---
+if [ "$DISABLE_FAILLOCK_OPTION" = "y" ]; then
+    echo -e "\n${BLUE}${BOLD}Restoring pam_faillock lockout security settings from backups...${NC}"
+    FAILLOCK_CONF="/etc/security/faillock.conf"
+    if [ -f "${FAILLOCK_CONF}.bak" ]; then
+        echo "Restoring $FAILLOCK_CONF..."
+        sudo mv "${FAILLOCK_CONF}.bak" "$FAILLOCK_CONF"
+    fi
+    PAM_FILES=("/etc/pam.d/system-auth" "/etc/pam.d/common-auth" "/etc/pam.d/password-auth")
+    for PAM_FILE in "${PAM_FILES[@]}"; do
+        if [ -f "${PAM_FILE}.bak" ]; then
+            echo "Restoring $PAM_FILE..."
+            sudo mv "${PAM_FILE}.bak" "$PAM_FILE"
+        fi
+    done
+    echo -e "${GREEN}[OK] pam_faillock lockout security policy restored successfully.${NC}"
 fi
 
 echo -e "\n${GREEN}${BOLD}======================================================================${NC}"
