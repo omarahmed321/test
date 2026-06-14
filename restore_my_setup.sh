@@ -1938,21 +1938,6 @@ input {
 # --- Keyring Fix ---
 # Start gnome-keyring-daemon for managing credentials and secrets securely in Electron/VSCode applications
 exec-once = gnome-keyring-daemon --start --components=secrets
-
-# --- Motion Trails (Motion Blur Effect) ---
-# Configuration for the hyprtrails plugin (Install/enable it by running the commands in the instructions)
-exec-once = hyprpm reload
-
-# hyprlang noerror true
-plugin {
-    hyprtrails {
-        color = rgba(8ec07cff) # Matches the active green shadow color
-        history_points = 80    # Max trail length (default was 20)
-        points_per_step = 5    # Max trail density (default was 2)
-        bezier_step = 0.01     # Smoother curve interpolation (default was 0.025)
-    }
-}
-# hyprlang noerror false
 EOF
 
 # --- WRITE ~/.config/hypr/keybindings.conf ---
@@ -2253,21 +2238,7 @@ layerrule = ignore_alpha 1, match:namespace swaync-control-center
 layerrule = blur 1, match:namespace logout_dialog
 EOF
 
-# --- WRITE ~/.config/hypr/animations.conf ---
-echo -e "${CYAN}Writing ~/.config/hypr/animations.conf...${NC}"
-cat << 'EOF' > "$HOME/.config/hypr/animations.conf"
-# ▄▀█ █▄░█ █ █▀▄▀█ ▄▀█ ▀█▀ █ █▀█ █▄░█
-# █▀█ █░▀█ █ █░▀░█ █▀█ ░█░ █ █▄█ █░▀█
-#
-# See https://wiki.hyprland.org/Configuring/Animations/
-# this file can be edited manually or use animation selector to select animations
 
-# disable animations while in hyprpicker and selection screenshot
-layerrule = no_anim on, match:namespace hyprpicker
-layerrule = no_anim on, match:namespace selection
-
-source = ~/.config/hypr/animations/animations-default.conf
-EOF
 
 # --- WRITE ~/.config/hypr/monitors.conf (DYNAMIC DETECTION) ---
 echo -e "${CYAN}Dynamically detecting connected monitors...${NC}"
@@ -3737,18 +3708,7 @@ if [ -f "$HOME/.config/hypr/themes/common.conf" ]; then
     sed -i '/exec = gsettings set org.gnome.desktop.interface cursor-size/d' "$HOME/.config/hypr/themes/common.conf"
 fi
 
-# --- Initialize and compile Hyprland Plugins ---
-if command -v hyprpm &>/dev/null; then
-    echo -e "\n${BLUE}${BOLD}Initializing Hyprland Plugin Manager (hyprpm)...${NC}"
-    echo -e "${CYAN}Running hyprpm update (may ask for sudo password)...${NC}"
-    hyprpm update || true
-    echo -e "${CYAN}Adding hyprland-plugins repository...${NC}"
-    hyprpm add https://github.com/hyprwm/hyprland-plugins || true
-    echo -e "${CYAN}Enabling hyprtrails plugin...${NC}"
-    hyprpm enable hyprtrails || true
-    echo -e "${CYAN}Reloading plugins...${NC}"
-    hyprpm reload || true
-fi
+
 
 # 5. Apply Settings and Refresh
 echo -e "\n${BLUE}${BOLD}Refreshing themes, icon caches, and font caches...${NC}"

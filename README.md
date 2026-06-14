@@ -104,6 +104,7 @@ The `restore_my_setup.sh` script automates the entire installation and configura
 - **Automated Wi-Fi Driver Patching**: Detects `/usr/src/8188eu-*` driver source directories and automatically executes `patch_driver.py` to fix compilation issues on kernels 6.1+, followed by rebuilding/reinstalling via DKMS.
 - **HyDE Framework Setup**: Clones the official `hyprdots` (HyDE) framework, automated using pre-seeded inputs to skip standard installation prompt timers.
 - **Night Light & Display GUI Wizards**: At the end of the installation, graphical setup wizards open automatically to let you configure your display color temperature and monitor layout before the first reboot.
+- **Compositor Animations**: Completely preserves native Hyprland/HyDE default animations and does not overwrite or touch any animation configuration files, letting you manage your curves via the standard HyDE animation selector.
 
 ---
 
