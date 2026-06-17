@@ -1836,6 +1836,50 @@ cat << 'EOF' > "$HOME/.config/Code/User/keybindings.json"
         "key": "ctrl+shift+i",
         "command": "editor.action.formatDocument",
         "when": "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "ctrl+alt+down",
+        "command": "editor.action.copyLinesDownAction",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "ctrl+alt+up",
+        "command": "editor.action.copyLinesUpAction",
+        "when": "editorTextFocus && !editorReadonly"
+    }
+]
+EOF
+
+echo -e "${CYAN}Writing Code - OSS configurations...${NC}"
+mkdir -p "$HOME/.config/Code - OSS/User"
+cp "$HOME/.config/Code/User/settings.json" "$HOME/.config/Code - OSS/User/settings.json"
+cat << 'EOF' > "$HOME/.config/Code - OSS/User/keybindings.json"
+// Place your key bindings in this file to override the defaults
+[
+    {
+        "key": "ctrl+pageup ctrl+pageup",
+        "command": "workbench.action.terminal.toggleTerminal",
+        "when": "terminal.active"
+    },
+    {
+        "key": "ctrl+`",
+        "command": "-workbench.action.terminal.toggleTerminal",
+        "when": "terminal.active"
+    },
+    {
+        "key": "ctrl+shift+i",
+        "command": "editor.action.formatDocument",
+        "when": "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "ctrl+alt+down",
+        "command": "editor.action.copyLinesDownAction",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "ctrl+alt+up",
+        "command": "editor.action.copyLinesUpAction",
+        "when": "editorTextFocus && !editorReadonly"
     }
 ]
 EOF
