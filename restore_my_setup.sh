@@ -139,7 +139,7 @@ REQUIRED_PACKAGES=(
     network-manager-applet brightnessctl pamixer playerctl udiskie
     nwg-look kvantum kvantum-qt5 qt5ct qt6ct qt5-wayland qt6-wayland
     awww parallel pacman-contrib imagemagick ffmpegthumbs kde-cli-tools
-    bc 8188eu-dkms-git antigravity antigravity-ide antigravity-cli prismlauncher cava tk
+    bc 8188eu-dkms-git antigravity antigravity-ide antigravity-cli prismlauncher cava tk python-gobject libadwaita
     wtype gnome-keyring ttf-cascadia-code-nerd
     oh-my-zsh-git zsh-theme-powerlevel10k zsh-autosuggestions
     zsh-syntax-highlighting zsh-completions
@@ -1072,6 +1072,8 @@ class DisplaySettingsApp(tk.Tk):
         try:
             subprocess.run(['hyprctl', 'keyword', 'monitor', f"{m_name},{res_hz},{position},{selected_scale}{extra_clean}"], check=True)
             update_monitor_config(m_name, selected_res, selected_hz, selected_scale, extra_clean)
+            # Ensure settings are fully applied on legacy/modern Hyprland sessions by triggering a reload
+            subprocess.run(['hyprctl', 'reload'], capture_output=True)
         except Exception as e:
             messagebox.showerror("Error", f"Failed to apply display settings: {e}")
             return
@@ -1400,15 +1402,8 @@ def _save_conf(t, g, e):
 
 
 def _patch_hyprland(t, e):
-    """Update the exec-once hyprsunset line in hyprland.conf."""
-    try:
-        txt = open(HYPRLAND_CONF).read()
-        new_line = (f"exec-once = hyprsunset -t {t}" if e
-                    else f"#exec-once = hyprsunset -t {t}  # DISABLED")
-        txt = re.sub(r"#?exec-once = hyprsunset.*", new_line, txt)
-        open(HYPRLAND_CONF, "w").write(txt)
-    except Exception as ex:
-        print(f"[nightlight] Warning: could not update hyprland.conf: {ex}")
+    """Disable patching hyprland.conf as we use nightlight-start.sh"""
+    pass
 
 
 def _apply_live(t, g, e):
@@ -4244,10 +4239,12 @@ if [ "$DISABLE_FAILLOCK_OPTION" = "y" ]; then
 fi
 
 echo -e "\n${GREEN}${BOLD}======================================================================${NC}"
-echo -e "${GREEN}${BOLD}   CONGRATULATIONS! Replicator script generation is complete!        ${NC}"
+echo -e "${GREEN}${BOLD}   CONGRATULATIONS! System Restoration is Complete!                  ${NC}"
 echo -e "${GREEN}${BOLD}======================================================================${NC}"
-echo -e "${YELLOW}To use this on your new CachyOS + Hyprland system:${NC}"
-echo -e "  1. Copy this script to the new machine."
-echo -e "  2. Run: ${CYAN}chmod +x restore_my_setup.sh${NC}"
-echo -e "  3. Run: ${CYAN}./restore_my_setup.sh${NC}"
-echo -e "======================================================================"
+echo -e "${YELLOW}Rebooting the system in 5 seconds to apply all changes...${NC}"
+for i in {5..1}; do
+    echo -e "  Rebooting in ${CYAN}$i${NC} seconds..."
+    sleep 1
+done
+echo -e "${BLUE}Rebooting now...${NC}"
+sudo reboot
