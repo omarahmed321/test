@@ -2999,9 +2999,10 @@ env = LIBVA_DRIVER_NAME,nvidia
 env = GBM_BACKEND,nvidia-drm
 env = __GLX_VENDOR_LIBRARY_NAME,nvidia
 env = __GL_VRR_ALLOWED,1
+env = NVD_BACKEND,direct
 
 cursor {
-    no_hardware_cursors = false
+    no_hardware_cursors = true
 }
 EOF
 else
@@ -4028,6 +4029,7 @@ if [ "$GPU_VENDOR" = "nvidia" ]; then
     echo -e "${CYAN}Setting clean default in /etc/modprobe.d/nvidia.conf...${NC}"
     sudo tee /etc/modprobe.d/nvidia.conf >/dev/null << 'NVIEOF'
 options nvidia_drm modeset=1
+options nvidia NVreg_RegistryDwords="PerfLevelSrc=0x2222"
 NVIEOF
     echo -e "${GREEN}[OK] Nvidia DRM configured successfully!${NC}"
 else
