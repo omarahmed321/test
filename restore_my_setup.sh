@@ -3109,7 +3109,7 @@ font_size 9.0
 window_padding_width 25
 include ~/.cache/wal/colors-kitty.conf
 cursor_trail 1
-background_opacity 0.85
+background_opacity 0.70
 #hide_window_decorations yes
 #confirm_os_window_close 0
 
@@ -4171,8 +4171,8 @@ decoration {{
 EOF
 
 cat << 'EOF' > "$HOME/.config/wal/templates/theme.css"
-@define-color bar-bg rgba({color0.rgb}, 0.85);
-@define-color main-bg rgba({color0.rgb}, 0.8);
+@define-color bar-bg rgba({color0.rgb}, 0.65);
+@define-color main-bg rgba({color0.rgb}, 0.6);
 @define-color main-fg {foreground};
 @define-color wb-act-bg rgba({color1.rgb}, 0.4);
 @define-color wb-act-fg {foreground};
