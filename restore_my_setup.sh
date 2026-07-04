@@ -3759,6 +3759,29 @@ zle -N select-all-line
 bindkey '^A' select-all-line
 EOF
 
+# --- WRITE ~/.config/yazi/yazi.toml ---
+echo -e "${CYAN}Writing ~/.config/yazi/yazi.toml...${NC}"
+mkdir -p "$HOME/.config/yazi"
+cat << 'EOF' > "$HOME/.config/yazi/yazi.toml"
+[opener]
+edit = [
+    { run = 'vim "%s"', block = true, for = "unix" }
+]
+code = [
+    { run = 'code "%s"', orphan = true, for = "unix" }
+]
+
+[open]
+prepend_rules = [
+    { mime = "text/*", use = [ "edit", "code" ] },
+    { url = "*.conf", use = [ "edit", "code" ] },
+    { url = "*.json", use = [ "edit", "code" ] },
+    { url = "*.toml", use = [ "edit", "code" ] },
+    { url = "*.sh", use = [ "edit", "code" ] },
+    { url = "*.lua", use = [ "edit", "code" ] }
+]
+EOF
+
 # --- WRITE ~/.config/fastfetch/logo.txt ---
 echo -e "${CYAN}Writing ~/.config/fastfetch/logo.txt...${NC}"
 mkdir -p "$HOME/.config/fastfetch"
