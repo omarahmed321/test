@@ -3355,11 +3355,11 @@ window#waybar {
 }
 
 .modules-left {
-    margin-left: 15px;
+    margin-left: 30px;
 }
 
 .modules-right {
-    margin-right: 15px;
+    margin-right: 30px;
 }
 
 tooltip {
