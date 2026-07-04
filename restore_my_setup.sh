@@ -140,7 +140,7 @@ REQUIRED_PACKAGES=(
     nwg-look kvantum kvantum-qt5 qt5ct qt6ct qt5-wayland qt6-wayland qt6-5compat qt6-virtualkeyboard qt6-multimedia
     awww parallel pacman-contrib imagemagick ffmpegthumbs kde-cli-tools
     bc 8188eu-dkms-git antigravity antigravity-ide antigravity-cli prismlauncher cava tk python-gobject libadwaita
-    wtype gnome-keyring ttf-cascadia-code-nerd
+    wtype gnome-keyring ttf-cascadia-code-nerd python-pywal
     oh-my-zsh-git zsh-theme-powerlevel10k zsh-autosuggestions
     zsh-syntax-highlighting zsh-completions
     wl-clipboard qt5-graphicaleffects qt5-quickcontrols qt5-quickcontrols2
