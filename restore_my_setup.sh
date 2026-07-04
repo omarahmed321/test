@@ -3355,17 +3355,17 @@ window#waybar {
 }
 
 .modules-left {
-    margin-left: 30px;
+    margin-left: 45px;
 }
 
 .modules-right {
-    margin-right: 30px;
+    margin-right: 45px;
 }
 
 tooltip {
     background: @main-bg;
     color: @main-fg;
-    border-radius: 9px;
+    border-radius: 0px;
     border-width: 0px;
 }
 
@@ -3373,7 +3373,7 @@ tooltip {
     box-shadow: none;
 	text-shadow: none;
     padding: 0px;
-    border-radius: 11px;
+    border-radius: 0px;
     margin-top: 3px;
     margin-bottom: 3px;
     margin-left: 0px;
@@ -3406,7 +3406,7 @@ tooltip {
     box-shadow: none;
 	text-shadow: none;
     padding: 0px;
-    border-radius: 11px;
+    border-radius: 0px;
     margin-top: 3px;
     margin-bottom: 3px;
     margin-left: 0px;
@@ -3492,13 +3492,13 @@ tooltip {
 }
 
 #custom-r_end {
-    border-radius: 0px 26px 26px 0px;
+    border-radius: 0px;
     margin-right: 11px;
     padding-right: 3px;
 }
 
 #custom-l_end {
-    border-radius: 26px 0px 0px 26px;
+    border-radius: 0px;
     margin-left: 11px;
     padding-left: 3px;
 }
@@ -3516,13 +3516,13 @@ tooltip {
 }
 
 #custom-rr_end {
-    border-radius: 0px 9px 9px 0px;
+    border-radius: 0px;
     margin-right: 11px;
     padding-right: 3px;
 }
 
 #custom-rl_end {
-    border-radius: 9px 0px 0px 9px;
+    border-radius: 0px;
     margin-left: 11px;
     padding-left: 3px;
 }
