@@ -132,12 +132,12 @@ fi
 echo -e "Detected GPU Vendor: ${CYAN}${GPU_VENDOR}${NC}"
 
 REQUIRED_PACKAGES=(
-    hyprland waybar dunst rofi-wayland kitty firefox code dolphin
+    hyprland waybar dunst rofi-wayland kitty firefox code dolphin yazi sddm-astronaut-theme
     swaylock-effects-git wlogout cliphist hyprpicker hyprsunset
     grimblast-git slurp jq polkit-kde-agent eza awesome-terminal-fonts
     ttf-meslo-nerd ttf-jetbrains-mono-nerd blueman bluez bluez-utils
     network-manager-applet brightnessctl pamixer playerctl udiskie
-    nwg-look kvantum kvantum-qt5 qt5ct qt6ct qt5-wayland qt6-wayland
+    nwg-look kvantum kvantum-qt5 qt5ct qt6ct qt5-wayland qt6-wayland qt6-5compat qt6-virtualkeyboard qt6-multimedia
     awww parallel pacman-contrib imagemagick ffmpegthumbs kde-cli-tools
     bc 8188eu-dkms-git antigravity antigravity-ide antigravity-cli prismlauncher cava tk python-gobject libadwaita
     wtype gnome-keyring ttf-cascadia-code-nerd
@@ -2214,7 +2214,7 @@ $mainMod = Super # super / meta / windows key
 # Assign apps
 $term = kitty
 $editor = code
-$file = dolphin
+$file = kitty -e yazi
 $browser = firefox
 
 # Window/Session actions
@@ -4022,44 +4022,29 @@ cat << 'EOF' > "$HOME/.config/fastfetch/config.jsonc"
 EOF
 
 # --- SDDM Theme Configuration ---
-echo -e "\n${BLUE}${BOLD}Configuring SDDM Candy theme...${NC}"
-if [ -f "$HOME/hyde/Source/arcs/Sddm_Candy.tar.gz" ]; then
-    echo -e "${CYAN}Installing SDDM theme Candy...${NC}"
-    sudo mkdir -p /usr/share/sddm/themes
-    sudo tar -xzf "$HOME/hyde/Source/arcs/Sddm_Candy.tar.gz" -C /usr/share/sddm/themes/
-    
-    if [ -f /etc/sddm.conf ]; then
-        if ! grep -q "^Current=" /etc/sddm.conf; then
-            echo -e "\n[Theme]\nCurrent=Candy" | sudo tee -a /etc/sddm.conf >/dev/null
-        else
-            sudo sed -i 's/^Current=.*/Current=Candy/' /etc/sddm.conf
-        fi
+echo -e "\n${BLUE}${BOLD}Configuring SDDM Astronaut theme...${NC}"
+if [ -f /etc/sddm.conf ]; then
+    if ! grep -q "^Current=" /etc/sddm.conf; then
+        echo -e "\n[Theme]\nCurrent=sddm-astronaut-theme" | sudo tee -a /etc/sddm.conf >/dev/null
     else
-        echo -e "[Theme]\nCurrent=Candy" | sudo tee /etc/sddm.conf >/dev/null
+        sudo sed -i 's/^Current=.*/Current=sddm-astronaut-theme/' /etc/sddm.conf
     fi
-
-    # Set SDDM Candy background to match the active theme wallpaper dynamically
-    if [ -L "$HOME/.cache/hyde/wall.set" ]; then
-        echo -e "${CYAN}Linking SDDM background to current desktop wallpaper...${NC}"
-        sudo cp -L "$HOME/.cache/hyde/wall.set" /usr/share/sddm/themes/Candy/backgrounds/bg.png
-    elif [ -f "$HOME/.cache/hyde/wall.set" ]; then
-        echo -e "${CYAN}Copying SDDM background to current desktop wallpaper...${NC}"
-        sudo cp "$HOME/.cache/hyde/wall.set" /usr/share/sddm/themes/Candy/backgrounds/bg.png
-    elif [ -f "$HOME/.config/hyde/themes/Gruvbox Retro/wallpapers/misty_forest.jpg" ]; then
-        echo -e "${CYAN}Copying default 'misty_forest.jpg' as SDDM background...${NC}"
-        sudo cp "$HOME/.config/hyde/themes/Gruvbox Retro/wallpapers/misty_forest.jpg" /usr/share/sddm/themes/Candy/backgrounds/bg.png
-    fi
-
-    # Customize SDDM Candy layout and accent color
-    if [ -f "/usr/share/sddm/themes/Candy/theme.conf" ]; then
-        echo -e "${CYAN}Customizing SDDM Candy layout (center, no header, theme orange)...${NC}"
-        sudo sed -i 's/^AccentColor=.*/AccentColor="#fe8019"/' /usr/share/sddm/themes/Candy/theme.conf
-        sudo sed -i 's/^FormPosition=.*/FormPosition="center"/' /usr/share/sddm/themes/Candy/theme.conf
-        sudo sed -i 's/^HeaderText=.*/HeaderText=""/' /usr/share/sddm/themes/Candy/theme.conf
-    fi
-
-    echo -e "${GREEN}[OK] SDDM Candy theme configured successfully!${NC}"
+else
+    echo -e "[Theme]\nCurrent=sddm-astronaut-theme" | sudo tee /etc/sddm.conf >/dev/null
 fi
+
+# Set SDDM Astronaut theme configuration
+if [ -d "/usr/share/sddm/themes/sddm-astronaut-theme" ]; then
+    echo -e "${CYAN}Customizing SDDM Astronaut theme configuration...${NC}"
+    # Ensure Themes/astronaut.conf uses the default astronaut artwork
+    if [ -f "/usr/share/sddm/themes/sddm-astronaut-theme/theme.conf" ]; then
+        sudo sed -i 's/^Background=.*/Background="Backgrounds\/astronaut.png"/' /usr/share/sddm/themes/sddm-astronaut-theme/theme.conf
+    fi
+    if [ -f "/usr/share/sddm/themes/sddm-astronaut-theme/Themes/astronaut.conf" ]; then
+        sudo sed -i 's/^Background=.*/Background="Backgrounds\/astronaut.png"/' /usr/share/sddm/themes/sddm-astronaut-theme/Themes/astronaut.conf
+    fi
+fi
+echo -e "${GREEN}[OK] SDDM Astronaut theme configured successfully!${NC}"
 
 # --- RTL8188EUS USB Wi-Fi Hotspot driver configuration ---
 echo -e "\n${BLUE}${BOLD}Configuring RTL8188EUS USB Wi-Fi driver and blacklisting conflicting drivers...${NC}"
