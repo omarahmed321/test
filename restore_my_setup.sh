@@ -4374,7 +4374,7 @@ general {
 
 background {
     monitor =
-    path = ~/.config/hyde/themes/Gruvbox Retro/wallpapers/background_for_me.jpg
+    path = ~/.cache/hyde/wall.set
     blur_passes = 3
     blur_size = 8
     noise = 0.0117
@@ -4384,16 +4384,29 @@ background {
     vibrancy_darkness = 0.0
 }
 
+# Image (Sticker)
+image {
+    monitor =
+    path = ~/.config/hypr/face.png
+    size = 200
+    rounding = 0
+    border_size = 0
+    border_color = rgba(0, 0, 0, 0)
+    position = 30, 30
+    halign = left
+    valign = bottom
+}
+
 # Time (Clock)
 label {
     monitor =
-    text = cmd[update:1000] echo -e "$(date +"%I:%M %p")"
-    color = $foreground
+    text = cmd[update:1000] echo -e "$(date +"%I:%M%p")"
+    color = $color3
     font_size = 94
     font_family = CaskaydiaCove Nerd Font Mono Bold
-    position = 0, 100
+    position = 0, -100
     halign = center
-    valign = center
+    valign = top
     shadow_passes = 2
     shadow_size = 4
 }
@@ -4405,9 +4418,23 @@ label {
     color = $foreground
     font_size = 22
     font_family = CaskaydiaCove Nerd Font Mono
-    position = 0, 20
+    position = 0, -260
     halign = center
-    valign = center
+    valign = top
+    shadow_passes = 2
+    shadow_size = 4
+}
+
+# Greeting
+label {
+    monitor =
+    text = cmd[update:3600000] echo "Hello, $USER"
+    color = $foreground
+    font_size = 20
+    font_family = CaskaydiaCove Nerd Font Mono
+    position = 0, -380
+    halign = center
+    valign = top
     shadow_passes = 2
     shadow_size = 4
 }
@@ -4416,21 +4443,27 @@ label {
 input-field {
     monitor =
     size = 260, 50
-    outline_thickness = 2
+    outline_thickness = 1
     dots_size = 0.28
     dots_spacing = 0.15
     dots_center = true
-    outer_color = $color4
-    inner_color = rgba(0, 0, 0, 0.4)
+    outer_color = rgba(255, 255, 255, 0.2)
+    inner_color = rgba(255, 255, 255, 0.1)
     font_color = $foreground
-    fade_on_empty = true
-    placeholder_text = <i>Enter Password...</i>
+    fade_on_empty = false
+    placeholder_text = Use Me
     hide_input = false
-    position = 0, -100
+    position = 0, -140
     halign = center
     valign = center
 }
 EOF
+
+if [ -f "$SCRIPT_DIR/dotfiles/hypr/face.png" ]; then
+    echo -e "${CYAN}Copying avatar face.png to ~/.config/hypr/...${NC}"
+    cp "$SCRIPT_DIR/dotfiles/hypr/face.png" "$HOME/.config/hypr/face.png"
+fi
+
 
 # --- WRITE TASKS MANAGER SCRIPT ---
 echo -e "${CYAN}Writing ~/.local/share/bin/manage_tasks.py...${NC}"
