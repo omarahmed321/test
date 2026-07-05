@@ -4090,17 +4090,28 @@ rmtask / edittask
 EOF
 fi
 
-# --- SDDM Theme Configuration ---
-echo -e "\n${BLUE}${BOLD}Configuring SDDM Astronaut theme...${NC}"
+# --- SDDM Theme & VT Optimization Configuration ---
+echo -e "\n${BLUE}${BOLD}Configuring SDDM Astronaut theme & VT1 Reuse...${NC}"
 if [ -f /etc/sddm.conf ]; then
     if ! grep -q "^Current=" /etc/sddm.conf; then
         echo -e "\n[Theme]\nCurrent=sddm-astronaut-theme" | sudo tee -a /etc/sddm.conf >/dev/null
     else
         sudo sed -i 's/^Current=.*/Current=sddm-astronaut-theme/' /etc/sddm.conf
     fi
+    
+    if ! grep -q "^MinimumVT=" /etc/sddm.conf; then
+        if grep -q "^\[X11\]" /etc/sddm.conf; then
+            sudo sed -i '/^\[X11\]/a MinimumVT=1' /etc/sddm.conf
+        else
+            echo -e "\n[X11]\nMinimumVT=1" | sudo tee -a /etc/sddm.conf >/dev/null
+        fi
+    else
+        sudo sed -i 's/^MinimumVT=.*/MinimumVT=1/' /etc/sddm.conf
+    fi
 else
-    echo -e "[Theme]\nCurrent=sddm-astronaut-theme" | sudo tee /etc/sddm.conf >/dev/null
+    echo -e "[Theme]\nCurrent=sddm-astronaut-theme\n\n[X11]\nMinimumVT=1" | sudo tee /etc/sddm.conf >/dev/null
 fi
+
 
 # Set SDDM Astronaut theme configuration to Jake the Dog variant
 if [ -d "/usr/share/sddm/themes/sddm-astronaut-theme" ]; then
