@@ -3794,6 +3794,22 @@ select-all-line() {
 }
 zle -N select-all-line
 bindkey '^A' select-all-line
+
+# Task management functions
+todo() {
+    python3 ~/.local/share/bin/manage_tasks.py todo "$*"
+    fastfetch
+}
+
+doing() {
+    python3 ~/.local/share/bin/manage_tasks.py doing "$*"
+    fastfetch
+}
+
+done() {
+    python3 ~/.local/share/bin/manage_tasks.py done "$*"
+    fastfetch
+}
 EOF
 
 # --- WRITE ~/.config/fish/config.fish ---
@@ -3815,6 +3831,22 @@ alias ll='eza -lha --icons=auto --sort=name --group-directories-first --no-permi
 alias ld='eza -lhD --icons=auto --no-permissions --no-user --no-filesize --time-style="+%Y/%-m/%-d %I:%M %p"'
 alias la='eza -lha --icons=auto --no-permissions --no-user --no-filesize --time-style="+%Y/%-m/%-d %I:%M %p"'
 alias lsa='eza -lha --icons=auto --no-permissions --no-user --no-filesize --time-style="+%Y/%-m/%-d %I:%M %p"'
+
+# Task management functions
+function todo
+    python3 ~/.local/share/bin/manage_tasks.py todo "$argv"
+    fastfetch
+end
+
+function doing
+    python3 ~/.local/share/bin/manage_tasks.py doing "$argv"
+    fastfetch
+end
+
+function done
+    python3 ~/.local/share/bin/manage_tasks.py done "$argv"
+    fastfetch
+end
 EOF
 
 # --- WRITE ~/.config/yazi/yazi.toml ---
@@ -4357,6 +4389,73 @@ input-field {
     valign = center
 }
 EOF
+
+# --- WRITE TASKS MANAGER SCRIPT ---
+echo -e "${CYAN}Writing ~/.local/share/bin/manage_tasks.py...${NC}"
+mkdir -p "$HOME/.local/share/bin"
+cat << 'EOF' > "$HOME/.local/share/bin/manage_tasks.py"
+#!/usr/bin/env python3
+import sys
+import os
+
+TASKS_FILE = os.path.expanduser("~/.config/fastfetch/tasks.txt")
+
+def read_tasks():
+    if not os.path.exists(TASKS_FILE):
+        return []
+    with open(TASKS_FILE, 'r') as f:
+        return [line.strip() for line in f if line.strip()]
+
+def write_tasks(tasks):
+    os.makedirs(os.path.dirname(TASKS_FILE), exist_ok=True)
+    with open(TASKS_FILE, 'w') as f:
+        for t in tasks:
+            f.write(t + "\n")
+
+def add_or_update(task_text, new_prefix):
+    tasks = read_tasks()
+    found = False
+    new_tasks = []
+    
+    cleaned_query = task_text.strip().lower()
+    
+    for t in tasks:
+        content = t
+        for pfx in ["[ ]", "[/]", "[x]", "- "]:
+            if t.startswith(pfx):
+                content = t[len(pfx):].strip()
+                break
+        
+        if content.lower() == cleaned_query:
+            new_tasks.append(f"{new_prefix} {content}")
+            found = True
+        else:
+            new_tasks.append(t)
+            
+    if not found:
+        new_tasks.append(f"{new_prefix} {task_text.strip()}")
+        
+    write_tasks(new_tasks)
+
+def main():
+    if len(sys.argv) < 3:
+        print("Usage: manage_tasks.py <todo|doing|done> <task_text>")
+        sys.exit(1)
+        
+    action = sys.argv[1]
+    task_text = sys.argv[2]
+    
+    if action == "todo":
+        add_or_update(task_text, "[ ]")
+    elif action == "doing":
+        add_or_update(task_text, "[/]")
+    elif action == "done":
+        add_or_update(task_text, "[x]")
+
+if __name__ == "__main__":
+    main()
+EOF
+chmod +x "$HOME/.local/share/bin/manage_tasks.py"
 
 # --- WRITE PRAYER TIMES SCRIPT ---
 echo -e "${CYAN}Writing ~/.local/share/bin/prayer_times.py...${NC}"
