@@ -4394,8 +4394,6 @@ label {
     position = 0, -100
     halign = center
     valign = top
-    shadow_passes = 2
-    shadow_size = 4
 }
 
 # Date
@@ -4408,8 +4406,6 @@ label {
     position = 0, -260
     halign = center
     valign = top
-    shadow_passes = 2
-    shadow_size = 4
 }
 
 # Greeting
@@ -4422,8 +4418,6 @@ label {
     position = 0, -380
     halign = center
     valign = top
-    shadow_passes = 2
-    shadow_size = 4
 }
 
 # Input Field (Password Box)
@@ -4434,9 +4428,11 @@ input-field {
     dots_size = 0.28
     dots_spacing = 0.15
     dots_center = true
-    outer_color = rgba(255, 255, 255, 0.2)
+    outer_color = rgba(255, 255, 255, 0.1)
     inner_color = rgba(255, 255, 255, 0.1)
-    font_color = $foreground
+    font_color = rgba(255, 255, 255, 0.8)
+    check_color = rgba(255, 255, 255, 0.1)
+    fail_color = rgba(255, 255, 255, 0.1)
     fade_on_empty = false
     placeholder_text = Use Me
     hide_input = false
