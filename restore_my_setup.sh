@@ -144,7 +144,7 @@ REQUIRED_PACKAGES=(
     oh-my-zsh-git zsh-theme-powerlevel10k zsh-autosuggestions
     zsh-syntax-highlighting zsh-completions
     wl-clipboard qt5-graphicaleffects qt5-quickcontrols qt5-quickcontrols2
-    seahorse networkmanager zenity fastfetch bibata-cursor-theme-bin
+    seahorse networkmanager zenity fastfetch bibata-cursor-theme-bin fzf cachyos-fish-config
     psmisc python dnsmasq hostapd iw sddm ananicy-cpp gammastep
 )
 
