@@ -3861,7 +3861,7 @@ function doing
     fastfetch
 end
 
-function done
+function donetask
     python3 ~/.local/share/bin/manage_tasks.py done "$argv"
     fastfetch
 end
