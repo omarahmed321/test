@@ -3780,6 +3780,27 @@ zle -N select-all-line
 bindkey '^A' select-all-line
 EOF
 
+# --- WRITE ~/.config/fish/config.fish ---
+echo -e "${CYAN}Writing ~/.config/fish/config.fish...${NC}"
+mkdir -p "$HOME/.config/fish"
+cat << 'EOF' > "$HOME/.config/fish/config.fish"
+source /usr/share/cachyos-fish-config/cachyos-config.fish
+
+# overwrite greeting
+# potentially disabling fastfetch
+function fish_greeting
+end
+set -gx EDITOR vim
+
+# Custom eza aliases to hide metadata
+alias l='eza -lh --icons=auto --no-permissions --no-user --no-filesize'
+alias ls='eza -1 --icons=auto'
+alias ll='eza -lha --icons=auto --sort=name --group-directories-first --no-permissions --no-user --no-filesize'
+alias ld='eza -lhD --icons=auto --no-permissions --no-user --no-filesize'
+alias la='eza -lha --icons=auto --no-permissions --no-user --no-filesize'
+alias lsa='eza -lha --icons=auto --no-permissions --no-user --no-filesize'
+EOF
+
 # --- WRITE ~/.config/yazi/yazi.toml ---
 echo -e "${CYAN}Writing ~/.config/yazi/yazi.toml...${NC}"
 mkdir -p "$HOME/.config/yazi"
