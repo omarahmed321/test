@@ -15,7 +15,7 @@ DEFAULT_SSID="tplink-7825"
 DEFAULT_PASS="bolbol123*#"
 WIFI_INT="wlan0"
 INTERNET_INT="enp37s0"
-CHANNEL="11"
+CHANNEL="6"
 
 # --- True User Configuration Path ---
 if [ -n "$SUDO_USER" ]; then
