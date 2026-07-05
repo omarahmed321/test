@@ -4384,23 +4384,10 @@ background {
     vibrancy_darkness = 0.0
 }
 
-# Image (Sticker)
-image {
-    monitor =
-    path = ~/.config/hypr/face.png
-    size = 200
-    rounding = 0
-    border_size = 0
-    border_color = rgba(0, 0, 0, 0)
-    position = 30, 30
-    halign = left
-    valign = bottom
-}
-
 # Time (Clock)
 label {
     monitor =
-    text = cmd[update:1000] echo -e "$(date +"%I:%M%p")"
+    text = cmd[update:1000] echo -e "$(env LC_ALL=en_US.UTF-8 date +"%I:%M %p")"
     color = $color3
     font_size = 94
     font_family = CaskaydiaCove Nerd Font Mono Bold
@@ -4414,7 +4401,7 @@ label {
 # Date
 label {
     monitor =
-    text = cmd[update:1000] echo -e "$(date +"%A, %d %B")"
+    text = cmd[update:1000] echo -e "$(env LC_ALL=en_US.UTF-8 date +"%A, %d %B")"
     color = $foreground
     font_size = 22
     font_family = CaskaydiaCove Nerd Font Mono
@@ -4459,10 +4446,6 @@ input-field {
 }
 EOF
 
-if [ -f "$SCRIPT_DIR/dotfiles/hypr/face.png" ]; then
-    echo -e "${CYAN}Copying avatar face.png to ~/.config/hypr/...${NC}"
-    cp "$SCRIPT_DIR/dotfiles/hypr/face.png" "$HOME/.config/hypr/face.png"
-fi
 
 
 # --- WRITE TASKS MANAGER SCRIPT ---
