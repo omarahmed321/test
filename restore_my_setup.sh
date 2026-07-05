@@ -3728,10 +3728,12 @@ function in {
 
 # Helpful aliases
 alias c='clear' # clear terminal
-alias l='eza -lh --icons=auto' # long list
+alias l='eza -lh --icons=auto --no-permissions --no-user --no-filesize' # long list
 alias ls='eza -1 --icons=auto' # short list
-alias ll='eza -lha --icons=auto --sort=name --group-directories-first' # long list all
-alias ld='eza -lhD --icons=auto' # long list dirs
+alias ll='eza -lha --icons=auto --sort=name --group-directories-first --no-permissions --no-user --no-filesize' # long list all
+alias ld='eza -lhD --icons=auto --no-permissions --no-user --no-filesize' # long list dirs
+alias la='eza -lha --icons=auto --no-permissions --no-user --no-filesize'
+alias lsa='eza -lha --icons=auto --no-permissions --no-user --no-filesize'
 alias lt='eza --icons=auto --tree' # list folder as tree
 alias un='$aurhelper -Rns' # uninstall package
 alias up='$aurhelper -Syu' # update system/package/aur
