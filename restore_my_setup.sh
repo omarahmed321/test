@@ -4283,14 +4283,32 @@ browser,
     outline: none !important;
 }
 
-/* Hide navigator toolbox off-screen by translating it up by a negative value (120px) plus a little extra */
+/* Hide navigator toolbox by default (height 0px, opacity 0, pointer-events none). */
 #navigator-toolbox {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
     width: 100% !important;
+    height: 0px !important;
+    min-height: 0px !important;
+    overflow: visible !important;
     z-index: 10000 !important;
-    transform: translateY(-120px) !important; /* Pushed completely out of the viewport */
+    opacity: 0 !important;
+    pointer-events: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* Hide the Zen navbar container off-screen by default using a negative Y translation */
+#zen-appcontent-navbar-container {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    z-index: 10000 !important;
+    transform: translateY(-120px) !important; /* Pushed completely out of the screen */
     opacity: 0 !important;
     pointer-events: none !important;
     border: none !important;
@@ -4300,12 +4318,22 @@ browser,
     transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
 }
 
-/* When focused (Ctrl+L), slide the toolbox down into view smoothly */
-#navigator-toolbox:focus-within {
+/* When focused (Ctrl+L), slide the Zen navbar down into view smoothly */
+#zen-appcontent-navbar-container:focus-within {
     transform: translateY(0) !important;
     opacity: 1 !important;
     pointer-events: auto !important;
     background: #090a09 !important; /* Dark theme background when active */
+}
+
+/* Restrict the floating urlbar to a clean, centered width so it never stretches full-width */
+#urlbar[focused="true"],
+#urlbar[breakout-extend="true"],
+#urlbar[zen-floating-urlbar="true"] {
+    width: 680px !important;
+    max-width: 90vw !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
 }
 
 /* Ensure only the search bar and its dropdown results are visible when focused */
