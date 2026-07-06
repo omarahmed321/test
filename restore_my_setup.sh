@@ -4311,10 +4311,8 @@ browser,
     background-color: transparent !important;
 }
 
-/* By default, hide the urlbar completely when not focused to prevent it from showing at the top */
+/* By default, hide the urlbar visually but keep it focusable (do NOT use display:none or visibility:hidden) */
 #urlbar:not([focused="true"]) {
-    display: none !important;
-    visibility: collapse !important;
     opacity: 0 !important;
     pointer-events: none !important;
 }
