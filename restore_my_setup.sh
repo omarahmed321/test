@@ -4284,16 +4284,7 @@ browser,
 }
 
 /* Completely and unconditionally hide the entire top navigator toolbox (search bar, URL bar, top strip) */
-#navigator-toolbox {
-    display: none !important;
-    visibility: collapse !important;
-    height: 0 !important;
-    min-height: 0 !important;
-    border: none !important;
-    box-shadow: none !important;
-}
-
-/* Ensure only the search bar and its dropdown results are visible */
+#navigator-toolbox,
 #urlbar,
 #urlbar-container,
 #urlbar-input-container,
@@ -4304,10 +4295,12 @@ browser,
 .urlbarView-results,
 .urlbarView-row,
 #urlbar-input {
-    visibility: visible !important;
+    display: none !important;
+    visibility: collapse !important;
+    height: 0 !important;
+    min-height: 0 !important;
     border: none !important;
     box-shadow: none !important;
-    outline: none !important;
 }
 
 /* Hide the little title separator */
