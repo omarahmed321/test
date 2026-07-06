@@ -4297,6 +4297,8 @@ browser,
     opacity: 0.02 !important;
     border: none !important;
     box-shadow: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
 }
 
 #navigator-toolbox:focus-within,
@@ -4305,7 +4307,8 @@ browser,
     min-height: 45px !important;
     overflow: visible !important;
     opacity: 1 !important;
-    background-color: #090a09 !important;
+    background: transparent !important;
+    background-color: transparent !important;
 }
 
 /* Ensure only the search bar and its dropdown results are visible */
@@ -4421,6 +4424,25 @@ browser,
     border: none !important;
     box-shadow: none !important;
     outline: none !important;
+}
+
+/* Hide everything inside the navigation bar except the search input container */
+#nav-bar-customization-target > :not(#urlbar-container) {
+    display: none !important;
+    visibility: collapse !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#nav-bar > :not(#nav-bar-customization-target) {
+    display: none !important;
+    visibility: collapse !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 /* Hide all toolbar buttons to keep it clean */
