@@ -2236,8 +2236,6 @@ animations {
 # Wipe clipboard history on startup to prevent database bloat
 exec-once = cliphist wipe
 
-# Force cursor to primary landscape monitor on startup
-exec-once = ~/.config/hypr/warp_cursor.sh
 EOF
 
 # --- WRITE ~/.config/hypr/keybindings.conf ---
@@ -4886,41 +4884,6 @@ EOF
 chmod +x "$HOME/.local/share/bin/lockscreen.sh"
 echo -e "${GREEN}lockscreen wrapper script written.${NC}"
 
-# --- WRITE CURSOR WARP SCRIPT ---
-echo -e "${CYAN}Writing ~/.config/hypr/warp_cursor.sh...${NC}"
-mkdir -p "$HOME/.config/hypr"
-cat << 'EOF' > "$HOME/.config/hypr/warp_cursor.sh"
-#!/usr/bin/env bash
-# warp_cursor.sh - Warp mouse cursor exactly to the center of the primary 144Hz monitor on startup
-
-sleep 3
-
-# Get monitors JSON
-monitors_json=$(hyprctl monitors -j 2>/dev/null)
-
-if [ -n "$monitors_json" ]; then
-    # Parse the monitor with the highest refresh rate (primary monitor)
-    mon_info=$(echo "$monitors_json" | jq -r 'sort_by(.refreshRate) | last' 2>/dev/null)
-    
-    if [ -n "$mon_info" ] && [ "$mon_info" != "null" ]; then
-        name=$(echo "$mon_info" | jq -r '.name')
-        x=$(echo "$mon_info" | jq -r '.x')
-        y=$(echo "$mon_info" | jq -r '.y')
-        w=$(echo "$mon_info" | jq -r '.width')
-        h=$(echo "$mon_info" | jq -r '.height')
-        
-        # Calculate center coordinates
-        cx=$(( x + w / 2 ))
-        cy=$(( y + h / 2 ))
-        
-        # Focus monitor and move cursor to exact center
-        hyprctl dispatch focusmonitor "$name"
-        hyprctl dispatch movecursor $cx $cy
-    fi
-fi
-EOF
-chmod +x "$HOME/.config/hypr/warp_cursor.sh"
-echo -e "${GREEN}warp_cursor script written.${NC}"
 
 # --- WRITE OMAR CUSTOM DOCUMENTATION TOOL ---
 echo -e "${CYAN}Writing ~/.local/share/bin/omar custom documentation helper...${NC}"
