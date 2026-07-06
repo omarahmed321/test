@@ -2237,7 +2237,7 @@ animations {
 exec-once = cliphist wipe
 
 # Zen Browser - Zero UI / Frameless
-windowrule = opacity 0.40 0.40, match:class ^(zen)$
+windowrule = opacity 0.90 0.90, match:class ^(zen)$
 windowrule = border_size 0, match:class ^(zen)$
 EOF
 
@@ -4346,10 +4346,22 @@ browser,
     color: #ffffff !important;
 }
 
-/* Hide the expand/collapse sidebar arrow button at the top-left */
-#zen-expand-sidebar-button {
+/* Hide all top titlebar buttons, window controls, and layout switchers */
+#titlebar,
+.titlebar-buttonbox-container,
+#window-controls,
+.titlebar-buttonbox,
+#zen-tabs-layout-button,
+#zen-expand-sidebar-button,
+#zen-sidebar-expand-button,
+#zen-workspaces-button,
+.zen-tabs-layout-switcher {
     display: none !important;
     visibility: collapse !important;
+    height: 0 !important;
+    width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 /* Hide all toolbar buttons to keep it clean */
