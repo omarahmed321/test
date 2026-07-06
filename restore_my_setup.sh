@@ -4283,13 +4283,29 @@ browser,
     outline: none !important;
 }
 
-/* Hide the entire navigator toolbox (top bar) completely using visibility */
+/* Hide navigator toolbox by default and expand on focus (Ctrl+L) or hover */
 #navigator-toolbox {
-    visibility: hidden !important;
-    height: 0 !important;
-    min-height: 0 !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 3px !important; /* Tiny trigger area at the top */
+    min-height: 3px !important;
+    overflow: hidden !important;
+    z-index: 10000 !important;
+    transition: height 0.2s ease, opacity 0.2s ease !important;
+    opacity: 0.02 !important;
     border: none !important;
     box-shadow: none !important;
+}
+
+#navigator-toolbox:focus-within,
+#navigator-toolbox:hover {
+    height: 45px !important; /* Expand to show the search bar */
+    min-height: 45px !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    background-color: #090a09 !important;
 }
 
 /* Ensure only the search bar and its dropdown results are visible */
