@@ -4260,10 +4260,10 @@ if [ ${#ZEN_PROFILES[@]} -gt 0 ]; then
         # Write userChrome.css
         cat << 'ZENCHROME' > "$profile/chrome/userChrome.css"
 /*
- * Zen Browser - Minimal Zero UI
+ * Zen Browser - Terminal Style (Transparent & Borderless)
  */
 
-/* Force terminal background color on the window and content area */
+/* Enable transparency on the main window and all content wrappers */
 :root,
 #main-window,
 #browser,
@@ -4273,7 +4273,8 @@ browser,
 #content-deck,
 #tabbrowser-deck,
 #tabbrowser-tabbox {
-    background-color: #090a09 !important;
+    background-color: transparent !important;
+    background: transparent !important;
     border: none !important;
     border-top: none !important;
     border-bottom: none !important;
@@ -4283,158 +4284,12 @@ browser,
     outline: none !important;
 }
 
-/* Hide navigator toolbox by default (height 0px, opacity 0, pointer-events none). */
-#navigator-toolbox {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 0px !important;
-    min-height: 0px !important;
-    overflow: visible !important;
-    z-index: 10000 !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    border: none !important;
-    box-shadow: none !important;
-    background: transparent !important;
-    background-color: transparent !important;
-}
-
-/* Keep the Zen navbar container at top 0 but height 0px and opacity 0.
-   This keeps it fully inside the viewport so Ctrl+L focus works 100% of the time,
-   while making it completely invisible and click-through when not typing. */
-#zen-appcontent-navbar-container {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 0px !important;
-    min-height: 0px !important;
-    overflow: visible !important;
-    z-index: 10000 !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    border: none !important;
-    box-shadow: none !important;
-    background: transparent !important;
-    background-color: transparent !important;
-    transition: opacity 0.15s ease !important;
-}
-
-/* When focused (Ctrl+L), make the Zen navbar container visible instantly */
-#zen-appcontent-navbar-container:focus-within {
-    opacity: 1 !important;
-    pointer-events: auto !important;
-}
-
-/* Ensure only the search bar and its dropdown results are visible when focused */
-#urlbar,
-#urlbar-container,
-#urlbar-input-container,
-#urlbar-background,
-#urlbar-results,
-.urlbarView,
-.urlbarView-body-outer,
-.urlbarView-results,
-.urlbarView-row,
-#urlbar-input {
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
-}
-
-#urlbar {
-    border: none !important;
-    box-shadow: none !important;
-    background: transparent !important;
-}
-
-#urlbar-background {
-    background-color: rgba(20, 20, 20, 0.9) !important;
-    backdrop-filter: blur(12px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 12px !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
-}
-
-/* Hide the little title separator */
-.urlbarView-title-separator {
-    display: none !important;
-}
-
-/* Hide all buttons/page-actions on the right side of the URL bar (including split view, workspaces, reader, bookmarks, etc.) */
-#page-action-buttons,
-#zen-split-views-box,
-.urlbar-page-action,
-#reader-mode-button,
-#star-button,
-#shopping-sidebar-button,
-#zen-current-workspace-indicator-container,
-#zen-workspaces-button {
-    display: none !important;
-    visibility: collapse !important;
-    width: 0 !important;
-    height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-/* Style the search bar input text to be bold, high contrast, and clear */
-#urlbar-input {
-    font-size: 18px !important;
-    font-weight: 700 !important;
-    color: #ffffff !important;
-    text-shadow: 0 0 5px rgba(0, 0, 0, 0.9), 0 0 2px rgba(0, 0, 0, 0.9) !important;
-}
-
-/* Style the search suggestions list */
-.urlbarView {
-    background: rgba(20, 20, 20, 0.85) !important;
-    backdrop-filter: blur(10px) !important;
-}
-
-/* Style suggestion items text to be bold and clear */
-.urlbarView-row {
-    font-size: 15px !important;
-    font-weight: 600 !important;
-    color: #e5e5e5 !important;
-    text-shadow: 0 0 3px rgba(0, 0, 0, 0.9) !important;
-}
-
-.urlbarView-secondary {
-    color: #aaaaaa !important;
-    font-weight: 500 !important;
-}
-
-.urlbarView-row[selected] {
-    background-color: rgba(255, 255, 255, 0.15) !important;
-    color: #ffffff !important;
-}
-
-/* Hide all top titlebar buttons, window controls, and layout switchers */
-#titlebar,
-.titlebar-buttonbox-container,
-#window-controls,
-.titlebar-buttonbox,
-#zen-tabs-layout-button,
-#zen-expand-sidebar-button,
-#zen-sidebar-expand-button,
-#zen-workspaces-button,
-.zen-tabs-layout-switcher {
-    display: none !important;
-    visibility: collapse !important;
-    height: 0 !important;
-    width: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-/* Completely remove any borders, shadows, backgrounds or lines from the top toolbox and nav-bar */
+/* Completely remove any default borders or separator lines */
 #navigator-toolbox,
 #nav-bar,
 #titlebar,
-#TabsToolbar {
+#TabsToolbar,
+#zen-appcontent-navbar-container {
     border: none !important;
     border-top: none !important;
     border-bottom: none !important;
@@ -4442,53 +4297,9 @@ browser,
     border-right: none !important;
     box-shadow: none !important;
     outline: none !important;
-    background: transparent !important;
-    background-color: transparent !important;
 }
 
-/* Strip borders, shadows, and outlines from all children inside the top bar to kill any residual lines */
-#navigator-toolbox *,
-#nav-bar *,
-#titlebar *,
-#TabsToolbar * {
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
-}
-
-/* Hide everything inside the navigation bar except the search input container */
-#nav-bar-customization-target > :not(#urlbar-container) {
-    display: none !important;
-    visibility: collapse !important;
-    width: 0 !important;
-    height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-#nav-bar > :not(#nav-bar-customization-target) {
-    display: none !important;
-    visibility: collapse !important;
-    width: 0 !important;
-    height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-/* Hide all toolbar buttons to keep it clean */
-#back-button,
-#forward-button,
-#reload-button,
-#stop-button,
-#downloads-button,
-#fxa-toolbar-menu-button,
-#nav-bar-overflow-button,
-#unified-extensions-button,
-.webextension-browser-action {
-    display: none !important;
-}
-
-/* Hide splitters and appcontent-splitter */
+/* Remove default splitters and frames */
 #zen-sidebar-splitter,
 #appcontent-splitter {
     display: none !important;
@@ -4498,55 +4309,7 @@ browser,
     visibility: collapse !important;
 }
 
-/* Hide sidebar and workspace panels by default when not expanded */
-:root:not(:has(#navigator-toolbox[zen-expanded="true"])) #zen-sidebar,
-:root:not(:has(#navigator-toolbox[zen-expanded="true"])) #zen-workspaces-wrapper,
-:root:not(:has(#navigator-toolbox[zen-expanded="true"])) #zen-workspaces-button,
-:root:not(:has(#navigator-toolbox[zen-expanded="true"])) .zen-current-workspace-indicator,
-:root:not(:has(#navigator-toolbox[zen-expanded="true"])) vbox.zen-workspace-tabs-section {
-    display: none !important;
-    width: 0 !important;
-    max-width: 0 !important;
-    min-width: 0 !important;
-    overflow: hidden !important;
-    visibility: collapse !important;
-    opacity: 0 !important;
-}
-
-/* When expanded via shortcut (Ctrl+Alt+S), show the sidebar cleanly */
-:root:has(#navigator-toolbox[zen-expanded="true"]) #zen-sidebar {
-    display: flex !important;
-    visibility: visible !important;
-    width: 240px !important;
-    max-width: 240px !important;
-    min-width: 240px !important;
-    opacity: 1 !important;
-    background-color: #090a09 !important;
-}
-
-/* Unconditionally hide sidebar, top bar, and all gaps when in fullscreen mode to prevent black bars/empty space */
-:root[inFullscreen] #zen-sidebar,
-:root[inFullscreen] #navigator-toolbox,
-:root[inFullscreen] #zen-sidebar-splitter,
-:root[inFullscreen] #appcontent-splitter {
-    display: none !important;
-    visibility: collapse !important;
-    width: 0 !important;
-    max-width: 0 !important;
-    min-width: 0 !important;
-    height: 0 !important;
-    min-height: 0 !important;
-}
-
-:root[inFullscreen] #browser,
-:root[inFullscreen] #appcontent,
-:root[inFullscreen] browser {
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-}
-
-/* Hide status panel / status bar */
+/* Hide status panels */
 #statuspanel,
 #browser-bottombox {
     display: none !important;
