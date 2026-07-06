@@ -4301,35 +4301,31 @@ browser,
     background-color: transparent !important;
 }
 
-/* Hide the Zen navbar container way off-screen when not focused to prevent hover triggers and screenshot visibility */
+/* Keep the Zen navbar container at top 0 but height 0px and opacity 0.
+   This keeps it fully inside the viewport so Ctrl+L focus works 100% of the time,
+   while making it completely invisible and click-through when not typing. */
 #zen-appcontent-navbar-container {
     position: fixed !important;
-    top: -999px !important; /* Pushed completely out of reach */
-    margin-top: -999px !important;
+    top: 0 !important;
     left: 0 !important;
     width: 100% !important;
     height: 0px !important;
     min-height: 0px !important;
     overflow: visible !important;
-    z-index: -100000 !important; /* Send to back when inactive */
+    z-index: 10000 !important;
     opacity: 0 !important;
     pointer-events: none !important;
     border: none !important;
     box-shadow: none !important;
     background: transparent !important;
     background-color: transparent !important;
-    transition: top 0.2s ease, opacity 0.15s ease !important;
+    transition: opacity 0.15s ease !important;
 }
 
-/* When focused (Ctrl+L), bring the Zen navbar container back into position instantly */
+/* When focused (Ctrl+L), make the Zen navbar container visible instantly */
 #zen-appcontent-navbar-container:focus-within {
-    top: 0 !important;
-    margin-top: 0 !important;
     opacity: 1 !important;
     pointer-events: auto !important;
-    z-index: 10000 !important;
-    background: transparent !important;
-    background-color: transparent !important;
 }
 
 /* Ensure only the search bar and its dropdown results are visible when focused */
