@@ -4283,33 +4283,29 @@ browser,
     outline: none !important;
 }
 
-/* Hide navigator toolbox by default (height 0px, opacity 0, pointer-events none). */
+/* Hide navigator toolbox off-screen by translating it up by a negative value (120px) plus a little extra */
 #navigator-toolbox {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
     width: 100% !important;
-    height: 0px !important;
-    min-height: 0px !important;
-    overflow: visible !important; /* Allow native floating URL bar to render outside the collapsed container */
     z-index: 10000 !important;
+    transform: translateY(-120px) !important; /* Pushed completely out of the viewport */
     opacity: 0 !important;
     pointer-events: none !important;
     border: none !important;
     box-shadow: none !important;
     background: transparent !important;
     background-color: transparent !important;
-    transition: opacity 0.15s ease !important;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
 }
 
-/* When focused (Ctrl+L), allow pointer events and show children, but keep height at 0px to prevent layout shift/black bars */
+/* When focused (Ctrl+L), slide the toolbox down into view smoothly */
 #navigator-toolbox:focus-within {
+    transform: translateY(0) !important;
     opacity: 1 !important;
     pointer-events: auto !important;
-    height: 0px !important;
-    min-height: 0px !important;
-    background: transparent !important;
-    background-color: transparent !important;
+    background: #090a09 !important; /* Dark theme background when active */
 }
 
 /* Ensure only the search bar and its dropdown results are visible when focused */
@@ -4326,13 +4322,6 @@ browser,
     border: none !important;
     box-shadow: none !important;
     outline: none !important;
-}
-
-/* Center and style the floating search bar in the middle of the screen */
-#urlbar-container {
-    width: 600px !important;
-    max-width: 90vw !important;
-    margin: 10px auto 0 auto !important;
 }
 
 #urlbar {
