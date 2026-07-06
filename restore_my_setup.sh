@@ -2238,8 +2238,7 @@ exec-once = cliphist wipe
 
 # Zen Browser Glassy Mode Rules
 windowrule = opacity 0.60 0.60, match:class ^(zen)$
-windowrule = blur, match:class ^(zen)$
-windowrule = ignorealpha 0.60, match:class ^(zen)$
+windowrule = blur 1, match:class ^(zen)$
 EOF
 
 # --- WRITE ~/.config/hypr/keybindings.conf ---
