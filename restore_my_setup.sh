@@ -4252,9 +4252,8 @@ if [ -n "$ZEN_PROFILE_DIR" ]; then
     mkdir -p "$ZEN_PROFILE_DIR/chrome"
     cat << 'ZENCHROME' > "$ZEN_PROFILE_DIR/chrome/userChrome.css"
 /*
- * Zen Browser Clean Glassy UI
- * Hides tabs and address bar by default, showing them on hover.
- * Transparent window background.
+ * Zen Browser Completely Empty and Transparent UI
+ * Hides all navigation bars, sidebars, and tab bars completely.
  */
 
 /* 1. Fully transparent background */
@@ -4270,63 +4269,22 @@ browser,
     background: transparent !important;
 }
 
-/* 2. Auto-hide the top bar (navigator toolbox) */
-#navigator-toolbox {
-    position: fixed !important;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 100;
-    transition: transform 0.2s ease-in-out !important;
-    transform: translateY(-100%);
-    opacity: 0;
-}
-
-#navigator-toolbox:hover,
-#navigator-toolbox:focus-within {
-    transform: translateY(0);
-    opacity: 1;
-}
-
-/* Add a tiny hover zone at the top of the window */
-#navigator-toolbox::after {
-    content: "";
-    position: absolute;
-    bottom: -15px;
-    left: 0;
-    width: 100%;
-    height: 15px;
-    background: transparent;
-    cursor: pointer;
-}
-
-/* 3. Auto-hide the sidebar (Zen vertical tabs) */
-#sidebar-box {
-    position: fixed !important;
-    left: 0;
-    top: 0;
-    height: 100%;
-    z-index: 99;
-    transition: transform 0.2s ease-in-out !important;
-    transform: translateX(-100%);
-    opacity: 0;
-}
-
-#sidebar-box:hover {
-    transform: translateX(0);
-    opacity: 1;
-}
-
-/* Add a tiny hover zone on the left edge */
-#sidebar-box::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: -15px;
-    width: 15px;
-    height: 100%;
-    background: transparent;
-    cursor: pointer;
+/* 2. Completely hide all top bars, sidebars, and tab toolboxes */
+#navigator-toolbox,
+#sidebar-box,
+#sidebar-select-box,
+#vertical-tabs,
+#zen-sidebar,
+.sidebar-wrapper,
+#zen-tabs,
+#tabbrowser-tabs,
+.tabbrowser-tab,
+#browser-sidebar {
+    display: none !important;
+    width: 0 !important;
+    max-width: 0 !important;
+    min-width: 0 !important;
+    visibility: collapse !important;
 }
 ZENCHROME
 
