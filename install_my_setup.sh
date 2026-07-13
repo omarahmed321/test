@@ -246,6 +246,19 @@ if [[ "$opt_deploy_dots" =~ ^[Yy]$ ]]; then
     chmod +x "$HOME/.local/share/bin/prayer_times.py"
     rm -f "$HOME/.config/waybar/prayer_times.py"
     
+    # Install bgapps and bgapps_pick scripts to the correct bin path
+    cp -f "$SCRIPT_DIR/configs/waybar/bgapps.sh" "$HOME/.local/share/bin/bgapps.sh"
+    chmod +x "$HOME/.local/share/bin/bgapps.sh"
+    rm -f "$HOME/.config/waybar/bgapps.sh"
+    
+    cp -f "$SCRIPT_DIR/configs/hypr/bgapps_pick.sh" "$HOME/.local/share/bin/bgapps_pick.sh"
+    chmod +x "$HOME/.local/share/bin/bgapps_pick.sh"
+    rm -f "$HOME/.config/hypr/bgapps_pick.sh"
+    
+    # Install manage_tasks.py script to the correct bin path
+    cp -f "$SCRIPT_DIR/configs/zsh/manage_tasks.py" "$HOME/.local/share/bin/manage_tasks.py"
+    chmod +x "$HOME/.local/share/bin/manage_tasks.py"
+    
     cp -rf "$SCRIPT_DIR/configs/kitty" "$HOME/.config/"
     cp -rf "$SCRIPT_DIR/configs/cava" "$HOME/.config/"
     
