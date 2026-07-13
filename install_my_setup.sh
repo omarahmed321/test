@@ -23,6 +23,14 @@ fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Detect existing AUR helper at startup
+AUR_HELPER=""
+if command -v yay &>/dev/null; then
+    AUR_HELPER="yay"
+elif command -v paru &>/dev/null; then
+    AUR_HELPER="paru"
+fi
+
 # Self-healing helper: check and fix pacman database lock
 fix_pacman_lock() {
     if [ -f "/var/lib/pacman/db.lck" ]; then
@@ -85,24 +93,33 @@ opt_disable_faillock="${opt_disable_faillock:-y}"
 if [[ "$opt_install_pkgs" =~ ^[Yy]$ ]]; then
     echo -e "\n${BLUE}${BOLD}[1/4] Checking and installing required packages...${NC}"
     
-    # Identify AUR helper
-    AUR_HELPER=""
-    if command -v yay &>/dev/null; then
-        AUR_HELPER="yay"
-    elif command -v paru &>/dev/null; then
-        AUR_HELPER="paru"
-    else
+    # Identify or install AUR helper
+    if [ -z "$AUR_HELPER" ]; then
         echo -e "${YELLOW}[INFO] Installing yay AUR helper...${NC}"
         fix_pacman_lock
         sudo pacman -S --needed --noconfirm base-devel git
+        rm -rf /tmp/yay-bin
         git clone https://aur.archlinux.org/yay-bin.git /tmp/yay-bin
-        cd /tmp/yay-bin && makepkg -si --noconfirm && cd -
-        AUR_HELPER="yay"
+        if cd /tmp/yay-bin && makepkg -si --noconfirm && cd - &>/dev/null; then
+            rm -rf /tmp/yay-bin
+        fi
+        
+        # Verify installation
+        if command -v yay &>/dev/null; then
+            AUR_HELPER="yay"
+        elif command -v paru &>/dev/null; then
+            AUR_HELPER="paru"
+        else
+            echo -e "${RED}[ERROR] Failed to install yay AUR helper. Arch Linux requires an AUR helper to install packages. Exiting...${NC}"
+            exit 1
+        fi
     fi
     
-    # Sync database & update keyrings
+    # Sync database & perform full system upgrade to prevent partial upgrade dependencies breakage
     fix_pacman_lock
-    sudo pacman -Sy
+    echo -e "${CYAN}Running full system database sync and update...${NC}"
+    sudo pacman -Syu --noconfirm
+    
     echo -e "${CYAN}Updating package keyrings to prevent signature errors...${NC}"
     sudo pacman -S --needed --noconfirm archlinux-keyring 2>/dev/null || true
     if pacman -Si cachyos-keyring &>/dev/null; then
@@ -241,13 +258,24 @@ if [[ "$opt_deploy_dots" =~ ^[Yy]$ ]]; then
     cp -f "$SCRIPT_DIR/configs/zsh/zshrc" "$HOME/.zshrc"
     
     # SDDM Login Screen
-    sudo cp -f "$SCRIPT_DIR/configs/sddm/sddm.conf" "/etc/sddm.conf"
+    sudo mkdir -p /etc/sddm.conf.d
+    cat << 'EOF' | sudo tee /etc/sddm.conf.d/theme.conf >/dev/null
+[Autologin]
+Session=hyprland
+
+[Theme]
+Current=sddm-astronaut-theme
+EOF
     sudo mkdir -p /usr/share/sddm/scripts
     sudo cp -f "$SCRIPT_DIR/configs/sddm/Xsetup" "/usr/share/sddm/scripts/Xsetup"
     sudo chmod +x /usr/share/sddm/scripts/Xsetup
 
     # Keyboard layout (Arabic variant thal_bksl)
-    sudo cp -f "$SCRIPT_DIR/ara-custom" "/usr/share/X11/xkb/symbols/ara"
+    if [ -f "/usr/share/X11/xkb/symbols/ara" ]; then
+        if ! grep -q "xkb_symbols \"thal_bksl\"" /usr/share/X11/xkb/symbols/ara; then
+            echo -e "\n// Custom Arabic layout variant with ذ (Arabic_thal) on the backslash key\npartial alphanumeric_keys\nxkb_symbols \"thal_bksl\" {\n    include \"ara(basic)\"\n    name[Group1]= \"Arabic (Thal on backslash)\";\n    key <BKSL> {[     Arabic_thal,        Arabic_shadda,           backslash,             bar ]};\n};" | sudo tee -a /usr/share/X11/xkb/symbols/ara >/dev/null
+        fi
+    fi
     
     # Zen Browser settings
     echo -e "${CYAN}Applying Zen Browser transparent themes & memory settings...${NC}"
@@ -408,6 +436,13 @@ EOF
         cp -f "$SCRIPT_DIR/wallpapers/background_for_me.jpg" "$HOME/.config/hyde/themes/Nordic Blue/wallpapers/background-for-me.jpg"
         cp -f "$SCRIPT_DIR/wallpapers/background_for_me.jpg" "$HOME/Pictures/Wallpapers/background-for-me.jpg"
         
+        # Resolve swww / awww compatibility symlinks dynamically
+        if command -v awww &>/dev/null && ! command -v swww &>/dev/null; then
+            echo -e "${CYAN}Creating swww symlinks for awww compatibility...${NC}"
+            sudo ln -sf /usr/bin/awww /usr/bin/swww
+            sudo ln -sf /usr/bin/awww-daemon /usr/bin/swww-daemon
+        fi
+
         # Apply wallpaper if swww is running or swwwallpaper.sh is available
         if command -v swww &>/dev/null; then
             # Initialize swww daemon if not running
