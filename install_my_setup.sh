@@ -78,6 +78,9 @@ opt_deploy_dots="${opt_deploy_dots:-y}"
 read -p "Install helper scripts (start_hotspot, double-pageup, display settings)? (y/n) [y]: " opt_helper_scripts
 opt_helper_scripts="${opt_helper_scripts:-y}"
 
+read -p "Permanently disable pam_faillock lockout policy (prevent wrong password lockouts)? (y/n) [y]: " opt_disable_faillock
+opt_disable_faillock="${opt_disable_faillock:-y}"
+
 # --- Step 1: Packages ---
 if [[ "$opt_install_pkgs" =~ ^[Yy]$ ]]; then
     echo -e "\n${BLUE}${BOLD}[1/4] Checking and installing required packages...${NC}"
@@ -435,6 +438,38 @@ echo -e "5. start_hotspot.sh: Script located in your home directory to run a nat
 echo -e "=============================================================================================================\n"
 EOF
     chmod +x "$HOME/.local/share/bin/omar"
+fi
+
+# --- Step 5: Disable pam_faillock Lockout Policy ---
+if [[ "$opt_disable_faillock" =~ ^[Yy]$ ]]; then
+    echo -e "\n${BLUE}${BOLD}Permanently disabling pam_faillock lockout policy (setting deny = 0)...${NC}"
+    FAILLOCK_CONF="/etc/security/faillock.conf"
+    if [ -f "$FAILLOCK_CONF" ]; then
+        if [ ! -f "${FAILLOCK_CONF}.bak" ]; then
+            echo "Creating backup of $FAILLOCK_CONF..."
+            sudo cp "$FAILLOCK_CONF" "${FAILLOCK_CONF}.bak"
+        fi
+        echo "Updating $FAILLOCK_CONF..."
+        if grep -qE '^\s*#?\s*deny\s*=' "$FAILLOCK_CONF"; then
+            sudo sed -i -E 's/^\s*#?\s*deny\s*=\s*[0-9]+/deny = 0/' "$FAILLOCK_CONF"
+        else
+            echo "deny = 0" | sudo tee -a "$FAILLOCK_CONF" >/dev/null
+        fi
+    fi
+    PAM_FILES=("/etc/pam.d/system-auth" "/etc/pam.d/common-auth" "/etc/pam.d/password-auth")
+    for PAM_FILE in "${PAM_FILES[@]}"; do
+        if [ -f "$PAM_FILE" ]; then
+            if grep -q "pam_faillock.so" "$PAM_FILE" && grep -q "deny=" "$PAM_FILE"; then
+                if [ ! -f "${PAM_FILE}.bak" ]; then
+                    echo "Creating backup of $PAM_FILE..."
+                    sudo cp "$PAM_FILE" "${PAM_FILE}.bak"
+                fi
+                echo "Updating inline 'deny' parameter in $PAM_FILE..."
+                sudo sed -i -E '/pam_faillock.so/s/deny=[0-9]+/deny=0/' "$PAM_FILE"
+            fi
+        fi
+    done
+    echo -e "${GREEN}[OK] pam_faillock lockout policy disabled successfully.${NC}"
 fi
 
 # --- Finished ---
