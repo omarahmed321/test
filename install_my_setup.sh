@@ -258,9 +258,11 @@ if [[ "$opt_deploy_dots" =~ ^[Yy]$ ]]; then
     cp -f "$SCRIPT_DIR/configs/zsh/zshrc" "$HOME/.zshrc"
     
     # SDDM Login Screen
+    REAL_USER=$(awk -F: '$3>=1000 && $3<60000 {print $1; exit}' /etc/passwd)
     sudo mkdir -p /etc/sddm.conf.d
-    cat << 'EOF' | sudo tee /etc/sddm.conf.d/theme.conf >/dev/null
+    cat << EOF | sudo tee /etc/sddm.conf.d/theme.conf >/dev/null
 [Autologin]
+User=$REAL_USER
 Session=hyprland
 
 [Theme]

@@ -57,8 +57,8 @@ fi
 CONFIG_DIR="${USER_HOME}/.config"
 CONFIG_FILE="${CONFIG_DIR}/hotspot_config"
 
-DEFAULT_SSID="tplink-7825"
-DEFAULT_PASS="bolbol123*#"
+DEFAULT_SSID="Arch_Hotspot"
+DEFAULT_PASS="12345678"
 
 if [ -f "$CONFIG_FILE" ]; then
     source "$CONFIG_FILE" 2>/dev/null
@@ -97,6 +97,7 @@ if [ "$choice" -eq 2 ]; then
         mkdir -p "$CONFIG_DIR"
         echo "SAVED_SSID=\"$SSID\"" > "$CONFIG_FILE"
         echo "SAVED_PASS=\"$PASSPHRASE\"" >> "$CONFIG_FILE"
+        chmod 600 "$CONFIG_FILE"
         if [ -n "$SUDO_USER" ]; then
             chown -R "$SUDO_USER:" "$CONFIG_DIR" 2>/dev/null || true
         fi
@@ -179,7 +180,7 @@ if ! command -v create_ap &>/dev/null; then
     if command -v pacman &>/dev/null; then
         # Try to install dependency chain
         pacman -S --needed --noconfirm dnsmasq hostapd iw psmisc haveged iptables || true
-        if [ -n "$SUDO_USER" ] && command -v sudo -u "$SUDO_USER" yay &>/dev/null; then
+        if [ -n "$SUDO_USER" ] && sudo -u "$SUDO_USER" command -v yay &>/dev/null; then
             sudo -u "$SUDO_USER" yay -S --needed --noconfirm linux-wifi-hotspot || true
         fi
     fi
