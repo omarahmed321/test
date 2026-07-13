@@ -1,0 +1,8 @@
+    "custom/prayer": {
+        "format": "{}",
+        "exec": "$HOME/.local/share/bin/prayer_times.py",
+        "interval": 1,
+        "rotate": ${r_deg},
+        "tooltip": false
+    },
+

@@ -1,0 +1,34 @@
+    "hyprland/workspaces": {
+        "disable-scroll": true,
+        "rotate": ${r_deg},
+        "all-outputs": true,
+        "active-only": false,
+        "on-click": "activate",
+        "disable-scroll": false,
+        "on-scroll-up": "hyprctl dispatch workspace -1",
+        "on-scroll-down": "hyprctl dispatch workspace +1",
+        "format": "{name} {windows}",
+        "format-window-separator": " ",
+        "window-rewrite-default": "",
+        "window-rewrite": {
+            "class<kitty>": "",
+            "class<firefox>": "",
+            "class<chromium>": "",
+            "class<google-chrome>": "",
+            "class<dolphin>": "󰉋",
+            "class<thunar>": "󰉋",
+            "class<vs-code-oss>": "󰨞",
+            "class<code-oss>": "󰨞",
+            "class<vscode>": "󰨞",
+            "class<discord>": "󰙯",
+            "class<spotify>": "",
+            "class<steam>": "",
+            "class<vlc>": "󰕼",
+            "class<mpv>": "󰕼"
+        },
+        "persistent-workspaces": {
+            "1": [],
+            "2": [],
+            "3": []
+        }
+    },

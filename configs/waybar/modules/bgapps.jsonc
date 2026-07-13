@@ -1,0 +1,7 @@
+        "custom/bgapps": {
+                "exec": "python3 ~/.local/share/bin/bgapps.sh",
+                "interval": 3,
+                "format": "{}",
+                "on-click": "python3 ~/.local/share/bin/bgapps_pick.sh",
+                "tooltip": false
+        },
