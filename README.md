@@ -9,10 +9,8 @@ This repository contains the complete configuration files and a lightweight, dyn
 Open your terminal and run the following single command to clone this repository and start the interactive installer:
 
 ```bash
-git clone https://github.com/omarahmed321/cachyos-restore.git ~/cachyos-restore && cd ~/cachyos-restore && ./install_my_setup.sh
+git clone https://github.com/omarahmed321/test.git ~/cachyos-restore && cd ~/cachyos-restore && ./install_my_setup.sh
 ```
-
-*(Note: If you are using the `test` repository, substitute the URL: `git clone https://github.com/omarahmed321/test.git ~/cachyos-restore && cd ~/cachyos-restore && ./install_my_setup.sh`)*
 
 ---
 
